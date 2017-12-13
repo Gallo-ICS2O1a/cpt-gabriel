@@ -6,6 +6,7 @@ laser_loc = PVector(pos.x + player_size/2,pos.y)
 keys1 = False
 keys2 = False
 keys3 = False
+
 def setup():
     size(800,600)
 
@@ -25,26 +26,26 @@ def draw():
         pos.y -= y_speed
     if keys2 == True:
         pos.y += y_speed
+        
     if keys3 == True:
-        rect(pos.x + player_size/2,pos.y,25,10)
+        rect(laser_loc.x,laser_loc.y,25,10)
         laser_loc.x += laser_speed
-
+        
     if pos.y - player_size/2 <= 0:
         pos.y = 0 + player_size/2
         
     if pos.y + player_size/2 >= height:
         pos.y = height - player_size/2
-        
+    
     if laser_loc.x >= width:
         laser_loc.x = pos.x + player_size/2
-        laser_loc.y = pos.y
         keys3 = False
-    
     
 def keyPressed():
     global keys1
     global keys2
     global keys3
+    global laser_loc
     if key == CODED:
         if keyCode == UP:
             keys1 = True
@@ -54,8 +55,7 @@ def keyPressed():
             keys2 = True
     
     if key == ' ':
-        keys3 = True
-            
+        keys3 = True    
             
 def keyReleased():
     global keys1
