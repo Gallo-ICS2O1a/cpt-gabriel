@@ -40,6 +40,8 @@ def draw():
     if laser_loc.x >= width:
         laser_loc.x = pos.x + player_size/2
         keys3 = False
+        
+
     
 def keyPressed():
     global keys1
@@ -55,7 +57,8 @@ def keyPressed():
             keys2 = True
     
     if key == ' ':
-        keys3 = True    
+        keys3 = True
+        laser_loc.y = pos.y    
             
 def keyReleased():
     global keys1
