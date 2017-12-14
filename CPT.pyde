@@ -9,6 +9,8 @@ keys3 = False
 
 def setup():
     size(800,600)
+    
+    # laser_loc.y = pos.y #
 
 def draw():
     global speed
@@ -58,7 +60,7 @@ def keyPressed():
     
     if key == ' ':
         keys3 = True
-        laser_loc.y = pos.y    
+            
             
 def keyReleased():
     global keys1
