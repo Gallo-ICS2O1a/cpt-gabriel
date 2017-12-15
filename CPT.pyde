@@ -1,6 +1,12 @@
 play = False
 menu = False
 instructions = False
+level_1_loadingscreen = False
+level_2_loadingscreen = False
+level_3_loadingscreen = False
+loading_time = 6
+opacity = 255
+fade_colour = 0
 y_speed = 10
 laser_speed = 10
 player_size = 50
@@ -19,6 +25,15 @@ def setup():
     size(800,600)
     
 def draw():
+    global play
+    global menu
+    global instructions
+    global level_1_loadingscreen
+    global level_2_loadingscreen
+    global level_3_loadingscreen
+    global loading_time
+    global opacity
+    global fade_colour
     global speed
     global pos
     global key_up
@@ -30,9 +45,6 @@ def draw():
     global hover_colour3
     global hover_colour4
     global click
-    global play
-    global menu
-    global instructions
     
     if menu == False:
         
@@ -72,7 +84,7 @@ def draw():
             hover_colour1[1] = 206
             hover_colour1[2] = 209
             if click == True:
-                play = True
+                level_1_loadingscreen = True
                 menu = True
                 
         if diff_play_sq.x <= -34 or diff_play_sq.x >= 34 or diff_play_sq.y <= -29 or diff_play_sq.y >= 29:
@@ -117,6 +129,7 @@ def draw():
         text("How To Play", width/2, height/2 - 250)
         textSize(24)
         textAlign(LEFT)
+        
         text("Control your character with the arrow keys; UP and DOWN.", 65, 140)
         text("Use the Spacebar to shoot your weapon.", 65, 175)
         text("You have 3 lives, when you reach 0 lives, you lose.", 65, 210) 
@@ -124,18 +137,22 @@ def draw():
         text("Each level has many enemies. There are 3 levels in total.", 65, 280) 
         text("Each enemy defeated gives a bonus to your score.",65,315)
         text("Each level has a boss at the end. Defeating it clears the level.",65, 350)
+        
         fill(hover_colour4[0], hover_colour4[1], hover_colour4[2])
         rect(width - 760, height - 80, 70,50)
         fill(0)
         text("Back",width - 750, height - 50)
+        
         center_back_square = PVector(width - 760 + 35, height - 80 + 25)
         diff_back_sq = PVector(mouseX - center_back_square.x, mouseY - center_back_square.y)
+        
         if diff_back_sq.x >= -35 and diff_back_sq.x <= 35 and diff_back_sq.y >= -25 and diff_back_sq.y <= 25:
             hover_colour4[0] = 0
             hover_colour4[1] = 206
             hover_colour4[2] = 209
             if click == True:
                 instructions = False
+                
         if diff_back_sq.x <= -35 or diff_back_sq.x >= 35 or diff_back_sq.y <= -25 or diff_back_sq.y >= 25:
             hover_colour4[0] = 175
             hover_colour4[1] = 238
@@ -143,9 +160,30 @@ def draw():
                 
         
         
+    if level_1_loadingscreen == True:
         
+        background(fade_colour,opacity)
+        fill(255,0,0,opacity)
+        textSize(58)
+        textAlign(CENTER)
+        text("LEVEL 1", width/2, height/2)
+        if frameCount % 5 == 0:
+            loading_time -= 0.001
+            opacity -= 255/20
+            fade_colour += 255/20
+            if fade_colour > 255:
+                fade_colour = 255
+                level_1_loadingscreen = False
+                play = True
+            if loading_time == 0:
+                level_1_loadingscreen = False
+                play = True
     
+        
+            
+        
     if play == True:
+        
         
         background(255)
         fill(255,0,0)
@@ -159,7 +197,7 @@ def draw():
          pos.y += y_speed
         
 
-    
+
         for lasers in laser_list:
             fill(0,0,255)
             rect(lasers.x, lasers.y, 25,10)
