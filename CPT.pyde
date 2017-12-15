@@ -5,7 +5,6 @@ y_speed = 10
 laser_speed = 10
 player_size = 50
 pos = PVector(0 + player_size/2,300)
-laser_loc = PVector(pos.x + player_size/2,pos.y)
 laser_list = []
 key_up =  False
 key_down = False
@@ -26,7 +25,6 @@ def draw():
     global key_down
     global key_space
     global laser_speed
-    global laser_loc
     global hover_colour1
     global hover_colour2
     global hover_colour3
@@ -74,7 +72,6 @@ def draw():
             hover_colour1[1] = 206
             hover_colour1[2] = 209
             if click == True:
-                click = False
                 play = True
                 menu = True
                 
@@ -147,6 +144,37 @@ def draw():
         
         
         
+    
+    if play == True:
+        
+        background(255)
+        fill(255,0,0)
+        ellipse(pos.x,pos.y,player_size,player_size)
+    
+            
+        if key_up == True:
+         pos.y -= y_speed
+            
+        if key_down == True:
+         pos.y += y_speed
+        
+
+    
+        for lasers in laser_list:
+            fill(0,0,255)
+            rect(lasers.x, lasers.y, 25,10)
+            lasers.x += laser_speed
+            if lasers.x > width:
+                laser_list.remove(lasers)
+                
+        
+        if pos.y - player_size/2 <= 0:
+            pos.y = 0 + player_size/2
+            
+        if pos.y + player_size/2 >= height:
+            pos.y = height - player_size/2
+            
+        
 def mousePressed():
     global click
     if mouseButton == LEFT:
@@ -155,39 +183,14 @@ def mousePressed():
 def mouseReleased():
     global click
     if mouseButton == LEFT:
-        click = False
-    
-
-    
-    if play == True:
-        
-        print(keyCode)
-        background(255)
-        fill(255,0,0)
-        ellipse(pos.x,pos.y,player_size,player_size)
-            
-        if key_up == True:
-            pos.y -= y_speed
-            
-        if key_down == True:
-            pos.y += y_speed
-            
-        if pos.y - player_size/2 <= 0:
-            pos.y = 0 + player_size/2
-            
-        if pos.y + player_size/2 >= height:
-            pos.y = height - player_size/2
-        
-        if laser_loc.x >= width:
-            laser_loc.x = pos.x + player_size/2
-            laser_list.remove(laser_loc)
+        click = False    
 
 
 def keyPressed():
     global key_up
     global key_down
     global key_space
-    global laser_loc
+    global laser_list
     if key == CODED:
         if keyCode == UP:
             key_up = True
@@ -195,11 +198,12 @@ def keyPressed():
     if key == CODED:
         if keyCode == DOWN:
             key_down = True
-    
-    if key == ' ':
-        laser_list.append(laser_loc)
-        key_space = True
             
+    if key == " ":
+        key_space = True
+        laser_list.append(PVector(pos.x + player_size/2,pos.y))
+
+ 
             
 def keyReleased():
     global key_up
@@ -213,8 +217,9 @@ def keyReleased():
         if keyCode == DOWN:
             key_down = False
     
-    if key == ' ':
+    if key == " ":
         key_space = False
+    
 
 
     
@@ -224,3 +229,4 @@ def keyReleased():
             
     
     
+
