@@ -1,5 +1,6 @@
 play = False
 menu = False
+instructions = False
 y_speed = 10
 laser_speed = 10
 player_size = 50
@@ -13,7 +14,7 @@ click = False
 hover_colour1 = [175,238,238]
 hover_colour2 = [175,238,238]
 hover_colour3 = [175,238,238]
-
+hover_colour4 = [175,238,238]
 
 def setup():
     size(800,600)
@@ -26,15 +27,18 @@ def draw():
     global key_space
     global laser_speed
     global laser_loc
-    global hover_colour
+    global hover_colour1
+    global hover_colour2
+    global hover_colour3
+    global hover_colour4
     global click
     global play
     global menu
-    mousePos = PVector(mouseX,mouseY)
+    global instructions
     
     if menu == False:
         
-        background(255,255)
+        background(255)
         textSize(48)
         strokeWeight(4)
         textAlign(CENTER,CENTER)
@@ -69,6 +73,7 @@ def draw():
             hover_colour1[1] = 206
             hover_colour1[2] = 209
             if click == True:
+                click = False
                 play = True
                 menu = True
         if diff_play_sq.x <= -34 or diff_play_sq.x >= 34 or diff_play_sq.y <= -29 or diff_play_sq.y >= 29:
@@ -79,6 +84,8 @@ def draw():
             hover_colour2[0] = 0
             hover_colour2[1] = 206
             hover_colour2[2] = 209
+            if click == True:
+                instructions = True
         if diff_howto_rect.x <= -94 or diff_howto_rect.x >= 94 or diff_howto_rect.y <= -29 or diff_howto_rect.y >= 29:
             hover_colour2[0] = 175
             hover_colour2[1] = 238
@@ -87,25 +94,63 @@ def draw():
             hover_colour3[0] = 0
             hover_colour3[1] = 206
             hover_colour3[2] = 209
+            if click == True:
+                exit()
         if diff_quit_sq.x <= -34 or diff_quit_sq.x >= 34 or diff_quit_sq.y <= -29 or diff_quit_sq.y >= 29:
             hover_colour3[0] = 175
             hover_colour3[1] = 238
             hover_colour3[2] = 238
+                
+    if instructions == True:
+                    
+        background(255)
+        textSize(48)
+        textAlign(CENTER, TOP)
+        text("How To Play", width/2, height/2 - 250)
+        textSize(24)
+        textAlign(LEFT)
+        text("Control your character with the arrow keys; UP and DOWN.", 65, 140)
+        text("Use the Spacebar to shoot your weapon.", 65, 175)
+        text("You have 3 lives, when you reach 0 lives, you lose.", 65, 210) 
+        text("Each level resets your lives to 3.", 65, 245)
+        text("Each level has many enemies. There are 3 levels in total.", 65, 280) 
+        text("Each enemy defeated gives a bonus to your score.",65,315)
+        text("Each level has a boss at the end. Defeating it clears the level.",65, 350)
+        fill(hover_colour4[0], hover_colour4[1], hover_colour4[2])
+        rect(width - 760, height - 80, 70,50)
+        fill(0)
+        text("Back",width - 750, height - 50)
+        center_back_square = PVector(width - 760 + 35, height - 80 + 25)
+        diff_back_sq = PVector(mouseX - center_back_square.x, mouseY - center_back_square.y)
+        if diff_back_sq.x >= -35 and diff_back_sq.x <= 35 and diff_back_sq.y >= -25 and diff_back_sq.y <= 25:
+            hover_colour4[0] = 0
+            hover_colour4[1] = 206
+            hover_colour4[2] = 209
+            if click == True:
+                instructions = False
+        if diff_back_sq.x <= -35 or diff_back_sq.x >= 35 or diff_back_sq.y <= -25 or diff_back_sq.y >= 25:
+            hover_colour4[0] = 175
+            hover_colour4[1] = 238
+            hover_colour4[2] = 238
+                
+        
         
         
 def mousePressed():
     global click
     if mouseButton == LEFT:
         click = True
-        
+    
 def mouseReleased():
     global click
     if mouseButton == LEFT:
         click = False
-        
+    
+
     
     if play == True:
         
+        print(keyCode)
         background(255)
         fill(255,0,0)
         ellipse(pos.x,pos.y,player_size,player_size)
@@ -115,13 +160,6 @@ def mouseReleased():
             
         if key_down == True:
             pos.y += y_speed
-            
-        for lasers in laser_list:
-            if len(laser_list) > 0:
-                rect(laser_loc.x,laser_loc.y,25,10)
-            laser_loc.x += laser_speed
-            
-            
             
         if pos.y - player_size/2 <= 0:
             pos.y = 0 + player_size/2
@@ -134,8 +172,6 @@ def mouseReleased():
             laser_list.remove(laser_loc)
 
 
-
-    
 def keyPressed():
     global key_up
     global key_down
@@ -168,6 +204,10 @@ def keyReleased():
     
     if key == ' ':
         key_space = False
+
+
+    
+
             
 
             
