@@ -69,6 +69,7 @@ def draw():
     
         
         if diff_play_sq.x >= -34 and diff_play_sq.x <= 34 and diff_play_sq.y >= -29 and diff_play_sq.y <= 29:
+            
             hover_colour1[0] = 0
             hover_colour1[1] = 206
             hover_colour1[2] = 209
@@ -76,27 +77,37 @@ def draw():
                 click = False
                 play = True
                 menu = True
+                
         if diff_play_sq.x <= -34 or diff_play_sq.x >= 34 or diff_play_sq.y <= -29 or diff_play_sq.y >= 29:
+            
             hover_colour1[0] = 175
             hover_colour1[1] = 238
             hover_colour1[2] = 238
+            
         if diff_howto_rect.x >= -94 and diff_howto_rect.x <= 94 and diff_howto_rect.y >= -29 and diff_howto_rect.y <= 29:
+            
             hover_colour2[0] = 0
             hover_colour2[1] = 206
             hover_colour2[2] = 209
             if click == True:
                 instructions = True
+                
         if diff_howto_rect.x <= -94 or diff_howto_rect.x >= 94 or diff_howto_rect.y <= -29 or diff_howto_rect.y >= 29:
+            
             hover_colour2[0] = 175
             hover_colour2[1] = 238
             hover_colour2[2] = 238
+            
         if diff_quit_sq.x >= -34 and diff_quit_sq.x <= 34 and diff_quit_sq.y >= -29 and diff_quit_sq.y <= 29:
+            
             hover_colour3[0] = 0
             hover_colour3[1] = 206
             hover_colour3[2] = 209
             if click == True:
                 exit()
+                
         if diff_quit_sq.x <= -34 or diff_quit_sq.x >= 34 or diff_quit_sq.y <= -29 or diff_quit_sq.y >= 29:
+            
             hover_colour3[0] = 175
             hover_colour3[1] = 238
             hover_colour3[2] = 238
