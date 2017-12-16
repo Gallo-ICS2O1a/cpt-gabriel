@@ -24,7 +24,7 @@ hover_colour1 = [175,238,238]
 hover_colour2 = [175,238,238]
 hover_colour3 = [175,238,238]
 hover_colour4 = [175,238,238]
-x = 0
+x_level1_background = 0
 y = 0
 
 def setup():
@@ -61,7 +61,7 @@ def draw():
     global enemy_size
     global enemy_speed
     global enemy_list
-    global x
+    global x_level1_background
     global y
     global img2
     img = loadImage("background.jpg")
@@ -205,10 +205,10 @@ def draw():
     if play == True:
         
         
-        x = constrain(x,0,img2.width - width)
+        x_level1_background = constrain(x_level1_background,0,img2.width - width)
         y = constrain(y,0,img2.height-height)
-        set(-x,0,img2)
-        x = frameCount
+        set(-x_level1_background,0,img2)
+        x_level1_background = frameCount
         fill(255,0,0)
         ellipse(pos.x,pos.y,player_size,player_size)
         
