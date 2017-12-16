@@ -10,6 +10,9 @@ fade_colour = 0
 y_speed = 10
 laser_speed = 10
 player_size = 50
+enemy_size = 40
+enemy_speed = random(2,5)
+enemy_list = []
 pos = PVector(0 + player_size/2,300)
 laser_list = []
 key_up =  False
@@ -45,14 +48,17 @@ def draw():
     global hover_colour3
     global hover_colour4
     global click
-    
+    global enemy_size
+    global enemy_speed
+    global enemy_list
+    img = loadImage("background.jpg")
     if menu == False:
         
-        background(255)
+        image(img,0,0)
         textSize(48)
         strokeWeight(4)
         textAlign(CENTER,CENTER)
-        fill(0)
+        fill(255)
         text("Airplane Shooting Game", width/2, height/2 - 50)
             
         fill(hover_colour1[0],hover_colour1[1],hover_colour1[2])
@@ -189,6 +195,7 @@ def draw():
         fill(255,0,0)
         ellipse(pos.x,pos.y,player_size,player_size)
     
+        
             
         if key_up == True:
          pos.y -= y_speed
@@ -196,7 +203,7 @@ def draw():
         if key_down == True:
          pos.y += y_speed
         
-
+        
 
         for lasers in laser_list:
             fill(0,0,255)
