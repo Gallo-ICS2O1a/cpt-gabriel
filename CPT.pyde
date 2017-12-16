@@ -1,6 +1,7 @@
 play = False
 menu = False
 instructions = False
+img2 = loadImage("background3.jpg")
 level_1_loadingscreen = False
 level_2_loadingscreen = False
 level_3_loadingscreen = False
@@ -23,9 +24,18 @@ hover_colour1 = [175,238,238]
 hover_colour2 = [175,238,238]
 hover_colour3 = [175,238,238]
 hover_colour4 = [175,238,238]
+x = 0
+y = 0
 
 def setup():
+    global img2
     size(800,600)
+    img2 = loadImage("background3.jpg")
+        
+    
+
+         
+    
     
 def draw():
     global play
@@ -51,10 +61,14 @@ def draw():
     global enemy_size
     global enemy_speed
     global enemy_list
+    global x
+    global y
+    global img2
     img = loadImage("background.jpg")
+    
     if menu == False:
         
-        image(img,0,0)
+        set(0,0,img)
         textSize(48)
         strokeWeight(4)
         textAlign(CENTER,CENTER)
@@ -191,10 +205,12 @@ def draw():
     if play == True:
         
         
-        background(255)
+        x = constrain(x,0,img2.width - width)
+        y = constrain(y,0,img2.height-height)
+        set(-x,0,img2)
+        x = frameCount
         fill(255,0,0)
         ellipse(pos.x,pos.y,player_size,player_size)
-    
         
             
         if key_up == True:
@@ -202,6 +218,7 @@ def draw():
             
         if key_down == True:
          pos.y += y_speed
+        
         
         
 
@@ -274,4 +291,3 @@ def keyReleased():
             
     
     
-
