@@ -1,21 +1,35 @@
-play = False
+play1 = False
+play2 = False
+play3 = False
 menu = False
 instructions = False
-img2 = loadImage("background3.jpg")
+x_level1_background = 0
+y_level1_background = 0
+x_level2_background = 0
+y_level2_background = 0
+background1 = loadImage("background3.jpg")
+background2 = loadImage("background4.jpg")
+background3 = 0
 level_1_loadingscreen = False
 level_2_loadingscreen = False
 level_3_loadingscreen = False
 loading_time = 6
 opacity = 255
 fade_colour = 0
+lives = 3
+score = 0
 y_speed = 10
 laser_speed = 10
+laser_damage = 5
 player_size = 50
 enemy_size = 40
-enemy_speed = random(2,5)
+enemy_speed = 10
+enemy_hp = 10
+boss_hp = 100
 enemy_list = []
 pos = PVector(0 + player_size/2,300)
 laser_list = []
+laser_center_list = []
 key_up =  False
 key_down = False
 key_space = False
@@ -24,21 +38,23 @@ hover_colour1 = [175,238,238]
 hover_colour2 = [175,238,238]
 hover_colour3 = [175,238,238]
 hover_colour4 = [175,238,238]
-x_level1_background = 0
-y = 0
+
 
 def setup():
-    global img2
+    global background1
+    global background2
+    global background3
     size(800,600)
-    img2 = loadImage("background3.jpg")
-        
+    background1 = loadImage("background3.jpg")
+    background2 = loadImage("background4.jpg")
     
 
          
     
     
 def draw():
-    global play
+    global play1
+    global play2
     global menu
     global instructions
     global level_1_loadingscreen
@@ -47,12 +63,17 @@ def draw():
     global loading_time
     global opacity
     global fade_colour
+    global lives
+    global score
     global speed
     global pos
+    global laser_list
+    global laser_center_list
     global key_up
     global key_down
     global key_space
     global laser_speed
+    global laser_damage
     global hover_colour1
     global hover_colour2
     global hover_colour3
@@ -61,9 +82,16 @@ def draw():
     global enemy_size
     global enemy_speed
     global enemy_list
+    global enemy_hp
+    global boss_hp
     global x_level1_background
-    global y
-    global img2
+    global y_level1_background
+    global x_level2_background 
+    global y_level2_background
+    global background1
+    global background2
+    global background3
+    
     img = loadImage("background.jpg")
     
     if menu == False:
@@ -194,21 +222,33 @@ def draw():
             if fade_colour > 255:
                 fade_colour = 255
                 level_1_loadingscreen = False
-                play = True
+                loading_time = 6
+                opacity = 255
+                fade_colour = 0
+                play1 = True
             if loading_time == 0:
                 level_1_loadingscreen = False
-                play = True
+                loading_time = 6
+                opacity = 255
+                fade_colour = 0
+                play1 = True
     
         
             
         
-    if play == True:
+    if play1 == True:
         
         
-        x_level1_background = constrain(x_level1_background,0,img2.width - width)
-        y = constrain(y,0,img2.height-height)
-        set(-x_level1_background,0,img2)
+        x_level1_background = constrain(x_level1_background,0,background1.width - width)
+        y_level1_background = constrain(y_level1_background,0,background1.height-height)
+        set(-x_level1_background,0,background1)
         x_level1_background = frameCount
+        fill(255)
+        textSize(30)
+        textAlign(BOTTOM, RIGHT)
+        text("Lives: " + str(lives), width - 130, height - 30)
+        
+        
         fill(255,0,0)
         ellipse(pos.x,pos.y,player_size,player_size)
         
@@ -218,13 +258,11 @@ def draw():
             
         if key_down == True:
          pos.y += y_speed
-        
-        
-        
+    
 
         for lasers in laser_list:
-            fill(0,0,255)
-            rect(lasers.x, lasers.y, 25,10)
+            fill(0,255,0)
+            rect(lasers.x, lasers.y, 26,10)
             lasers.x += laser_speed
             if lasers.x > width:
                 laser_list.remove(lasers)
@@ -235,6 +273,87 @@ def draw():
             
         if pos.y + player_size/2 >= height:
             pos.y = height - player_size/2
+            
+            
+            
+    if level_2_loadingscreen == True:
+        
+        background(fade_colour,opacity)
+        fill(255,0,0,opacity)
+        textSize(58)
+        textAlign(CENTER)
+        text("LEVEL 2", width/2, height/2)
+        if frameCount % 5 == 0:
+            loading_time -= 0.001
+            opacity -= 255/20
+            fade_colour += 255/20
+            if fade_colour > 255:
+                fade_colour = 255
+                level_2_loadingscreen = False
+                play2 = True
+            if loading_time == 0:
+                level_2_loadingscreen = False
+                play2 = True
+                
+    if play2 == True:
+        
+        x_level2_background = constrain(x_level2_background,0,background2.width - width)
+        y_level2_background = constrain(y_level2_background,0,background2.height-height)
+        set(-x_level2_background,0,background2)
+        x_level2_background = frameCount
+        fill(255)
+        textSize(30)
+        textAlign(BOTTOM, RIGHT)
+        text("Lives: " + str(lives), width - 130, height - 30)
+        
+        
+        fill(255,0,0)
+        ellipse(pos.x,pos.y,player_size,player_size)
+        
+            
+        if key_up == True:
+         pos.y -= y_speed
+            
+        if key_down == True:
+         pos.y += y_speed
+    
+
+        for lasers in laser_list:
+            fill(0,255,0)
+            rect(lasers.x, lasers.y, 26,10)
+            lasers.x += laser_speed
+            if lasers.x > width:
+                laser_list.remove(lasers)
+                
+        
+        if pos.y - player_size/2 <= 0:
+            pos.y = 0 + player_size/2
+            
+        if pos.y + player_size/2 >= height:
+            pos.y = height - player_size/2
+        
+        
+            
+            
+            
+    if level_3_loadingscreen == True:
+        
+        background(fade_colour,opacity)
+        fill(255,0,0,opacity)
+        textSize(58)
+        textAlign(CENTER)
+        text("LEVEL 3", width/2, height/2)
+        if frameCount % 5 == 0:
+            loading_time -= 0.001
+            opacity -= 255/20
+            fade_colour += 255/20
+            if fade_colour > 255:
+                fade_colour = 255
+                level_3_loadingscreen = False
+                play3 = True
+            if loading_time == 0:
+                level_3_loadingscreen = False
+                play3 = True
             
         
 def mousePressed():
@@ -263,10 +382,10 @@ def keyPressed():
             
     if key == " ":
         key_space = True
-        laser_list.append(PVector(pos.x + player_size/2,pos.y))
-
- 
-            
+        laser_list.append(PVector(pos.x + player_size/2, pos.y))
+        
+          
+              
 def keyReleased():
     global key_up
     global key_down
