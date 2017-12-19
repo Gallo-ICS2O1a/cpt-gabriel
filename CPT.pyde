@@ -273,6 +273,10 @@ def draw():
             enemies.x -= random(2,5)
             if enemies.x < 0:
                 enemy_list.remove(enemies)
+            dif1 = PVector.sub(enemies, pos)
+            if dif1.mag() < player_size/2 + enemy_size/2:
+                enemy_list.remove(enemies)
+                lives -= 1
             if len(laser_list) > 0:
                 for laser_locs in laser_list:
                     temp = PVector(laser_locs.x + 13, laser_locs.y + 5)
@@ -280,7 +284,8 @@ def draw():
                     if dif.mag() < enemy_size/2:
                         laser_list.remove(lasers)
                         enemy_list.remove(enemies)
-            
+       
+                 
           
         if lives == 0:
             exit()
