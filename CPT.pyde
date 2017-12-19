@@ -25,6 +25,8 @@ player_size = 50
 enemy_size = 40
 enemy_speed = 3
 boss_hp = 100
+boss_size = 100
+boss = PVector(width + 100, height/2)
 enemy_list = []
 enemy_spawn = False
 pos = PVector(0 + player_size / 2, 300)
@@ -83,6 +85,8 @@ def draw():
     global enemy_list
     global enemy_spawn
     global boss_hp
+    global boss_size
+    global boss
     global x_level1_background
     global y_level1_background
     global x_level2_background
@@ -285,12 +289,14 @@ def draw():
                         laser_list.remove(lasers)
                         enemy_list.remove(enemies)
        
-        print(frameCount)
-        print(background1.width - 800)
         if frameCount > background1.width - 800:
             enemy_spawn = True
             fill(255)
-            ellipse(width - 100, height/2, 100,100)
+            ellipse(boss.x, boss.y, boss_size,boss_size)
+            boss.x -= enemy_speed
+            if boss.x <= width - 200:
+                enemy_speed = 0
+            
             
           
         if lives == 0:
