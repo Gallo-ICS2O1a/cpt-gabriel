@@ -285,7 +285,13 @@ def draw():
                         laser_list.remove(lasers)
                         enemy_list.remove(enemies)
        
-                 
+        print(frameCount)
+        print(background1.width - 800)
+        if frameCount > background1.width - 800:
+            enemy_spawn = True
+            fill(255)
+            ellipse(width - 100, height/2, 100,100)
+            
           
         if lives == 0:
             exit()
