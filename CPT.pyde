@@ -24,7 +24,6 @@ laser_damage = 5
 player_size = 50
 enemy_size = 40
 enemy_speed = 3
-enemy_hp = 10
 boss_hp = 100
 enemy_list = []
 enemy_spawn = False
@@ -80,7 +79,6 @@ def draw():
     global enemy_size
     global enemy_speed
     global enemy_list
-    global enemy_hp
     global enemy_spawn
     global boss_hp
     global x_level1_background
@@ -261,11 +259,18 @@ def draw():
             
         if len(enemy_list) > 10:
             enemy_spawn = True
+        
+        if len(enemy_list) < 10:
+            enemy_spawn = False
             
         for enemies in enemy_list:
             fill(0)
             ellipse(enemies.x,enemies.y,enemy_size,enemy_size)
             enemies.x -= random(2,5)
+            dif2 = PVector.sub(enemies,pos)
+            if dif2.mag() < player_size/2 + enemy_size/2:
+                lives -= 1
+                enemy_list.remove(enemies)
             if enemies.x < 0:
                 enemy_list.remove(enemies)
             if len(laser_list) > 0:
@@ -274,7 +279,14 @@ def draw():
                 if dif.mag() < enemy_size/2:
                     laser_list.remove(lasers)
                     enemy_list.remove(enemies)
-                
+            
+          
+        
+       
+        
+        
+        if lives == 0:
+            exit()
         
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
