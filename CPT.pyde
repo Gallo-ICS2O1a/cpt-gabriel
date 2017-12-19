@@ -38,15 +38,17 @@ hover_colour1 = [175, 238, 238]
 hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
-
+img = loadImage("background.jpg")
 
 def setup():
     global background1
     global background2
     global background3
+    global img
     size(800, 600)
     background1 = loadImage("background3.jpg")
     background2 = loadImage("background4.jpg")
+    img = loadImage("background.jpg")
 
 
 def draw():
@@ -88,7 +90,8 @@ def draw():
     global background1
     global background2
     global background3
-    img = loadImage("background.jpg")
+    global img
+    
 
     if menu == False:
         
@@ -232,6 +235,7 @@ def draw():
         y_level1_background = constrain(y_level1_background, 0, background1.height - height)
         set(-x_level1_background, 0, background1)
         x_level1_background = frameCount
+        
 
         fill(255)
         textSize(30)
@@ -278,10 +282,6 @@ def draw():
                         enemy_list.remove(enemies)
             
           
-        
-       
-        
-        
         if lives == 0:
             exit()
         
