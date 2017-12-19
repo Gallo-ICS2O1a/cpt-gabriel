@@ -267,18 +267,15 @@ def draw():
             fill(0)
             ellipse(enemies.x,enemies.y,enemy_size,enemy_size)
             enemies.x -= random(2,5)
-            dif2 = PVector.sub(enemies,pos)
-            if dif2.mag() < player_size/2 + enemy_size/2:
-                lives -= 1
-                enemy_list.remove(enemies)
             if enemies.x < 0:
                 enemy_list.remove(enemies)
             if len(laser_list) > 0:
-                temp = PVector(lasers.x + 13, lasers.y + 5)
-                dif = PVector.sub(temp,enemies)
-                if dif.mag() < enemy_size/2:
-                    laser_list.remove(lasers)
-                    enemy_list.remove(enemies)
+                for laser_locs in laser_list:
+                    temp = PVector(laser_locs.x + 13, laser_locs.y + 5)
+                    dif = PVector.sub(temp,enemies)
+                    if dif.mag() < enemy_size/2:
+                        laser_list.remove(lasers)
+                        enemy_list.remove(enemies)
             
           
         
