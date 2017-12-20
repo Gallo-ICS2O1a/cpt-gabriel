@@ -19,15 +19,17 @@ opacity = 255
 fade_colour = 0
 lives = 3
 score = 0
-y_speed = 10
+y_speed = 5
 laser_speed = 10
 laser_damage = 5
 player_size = 50
 enemy_size = 40
-enemy_speed = 3
+enemy_speed = PVector(3,0)
 boss_hp = 100
 boss_size = 100
 boss = PVector(800 + 100, 600/2)
+boss_speed = PVector(2,0)
+boss_pattern1 = PVector(boss.x - boss_size/2,random(boss.y + player_size/2, boss.y - player_size/2))
 enemy_list = []
 enemy_spawn = False
 pos = PVector(0 + player_size / 2, 300)
@@ -87,6 +89,8 @@ def draw():
     global boss_hp
     global boss_size
     global boss
+    global boss_speed
+    global boss_pattern1
     global x_level1_background
     global y_level1_background
     global x_level2_background
@@ -276,28 +280,39 @@ def draw():
         for enemies in enemy_list:
             fill(0)
             ellipse(enemies.x,enemies.y,enemy_size,enemy_size)
-            enemies.x -= random(2,5)
+            enemies.x -= enemy_speed.x
             if enemies.x < 0:
                 enemy_list.remove(enemies)
             dif1 = PVector.sub(enemies, pos)
-            if dif1.mag() < player_size/2 + enemy_size/2:
+            if dif1.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemies)
-                lives -= 1
+                #lives -= 1
             if len(laser_list) > 0:
                 for laser_locs in laser_list:
                     temp = PVector(laser_locs.x + 13, laser_locs.y + 5)
                     dif = PVector.sub(temp,enemies)
                     if dif.mag() < enemy_size/2 and len(laser_list) > 0:
+                        print(dif.mag())
                         laser_list.remove(lasers)
                         enemy_list.remove(enemies)
        
-        if frameCount > background1.width - 800:
+        if frameCount > background1.width - 700:
             enemy_spawn = True
             fill(255)
             ellipse(boss.x, boss.y, boss_size,boss_size)
-            boss.x -= enemy_speed
-            if boss.x <= width - 200:
-                enemy_speed = 0
+            boss.x -= boss_speed.x
+            if boss.x <= width - 100:
+                boss_speed.x = 0
+            ellipse(boss_pattern1.x,boss_pattern1.y,30,30)
+            dif2 = PVector.sub(boss,pos)
+            dir = PVector.fromAngle(dif2.heading())
+            boss_attack = PVector.sub(boss_pattern1, dir)
+            move = PVector.sub(enemy_speed,dir)
+            boss_pattern1 = PVector.sub(boss_pattern1,move)
+            if boss_pattern1.x < 0:
+                boss_pattern1.x = boss.x - boss_size/2
+                boss_pattern1.y = random(boss.y + player_size/2, boss.y - player_size/2)
+            print(boss_pattern1)
             
             
           
