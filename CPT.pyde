@@ -40,6 +40,7 @@ hover_colour1 = [175, 238, 238]
 hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
+powerups = False
 
 def setup():
     global background1
@@ -50,6 +51,7 @@ def setup():
     background1 = loadImage("background3.jpg")
     background2 = loadImage("background4.jpg")
     main_menu_background = loadImage("background.jpg")
+
 
 
 def draw():
@@ -93,7 +95,7 @@ def draw():
     global background2
     global background3
     global main_menu_background
-    
+    global powerups
 
     if menu == False:
         
@@ -224,12 +226,14 @@ def draw():
                 opacity = 255
                 fade_colour = 0
                 play1 = True
+                powerups = True
             if loading_time == 0:
                 level_1_loadingscreen = False
                 loading_time = 6
                 opacity = 255
                 fade_colour = 0
                 play1 = True
+                powerups = True
 
     if play1 == True:
 
@@ -237,7 +241,6 @@ def draw():
         y_level1_background = constrain(y_level1_background, 0, background1.height - height)
         set(-x_level1_background, 0, background1)
         x_level1_background = frameCount
-        
 
         fill(255)
         textSize(30)
@@ -252,7 +255,8 @@ def draw():
 
         if key_down == True:
             pos.y += y_speed
-
+            
+            
         for lasers in laser_list:
             fill(0, 255, 0)
             rect(lasers.x, lasers.y, 26, 10)
