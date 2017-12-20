@@ -10,6 +10,7 @@ y_level2_background = 0
 background1 = loadImage("background3.jpg")
 background2 = loadImage("background4.jpg")
 background3 = 0
+main_menu_background = loadImage("background.jpg")
 level_1_loadingscreen = False
 level_2_loadingscreen = False
 level_3_loadingscreen = False
@@ -26,12 +27,11 @@ enemy_size = 40
 enemy_speed = 3
 boss_hp = 100
 boss_size = 100
-boss = PVector(width + 100, height/2)
+boss = PVector(800 + 100, 600/2)
 enemy_list = []
 enemy_spawn = False
 pos = PVector(0 + player_size / 2, 300)
 laser_list = []
-laser_center_list = []
 key_up = False
 key_down = False
 key_space = False
@@ -40,17 +40,16 @@ hover_colour1 = [175, 238, 238]
 hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
-img = loadImage("background.jpg")
 
 def setup():
     global background1
     global background2
     global background3
-    global img
+    global main_menu_background
     size(800, 600)
     background1 = loadImage("background3.jpg")
     background2 = loadImage("background4.jpg")
-    img = loadImage("background.jpg")
+    main_menu_background = loadImage("background.jpg")
 
 
 def draw():
@@ -66,10 +65,9 @@ def draw():
     global fade_colour
     global lives
     global score
-    global speed
+    global y_speed
     global pos
     global laser_list
-    global laser_center_list
     global key_up
     global key_down
     global key_space
@@ -94,12 +92,12 @@ def draw():
     global background1
     global background2
     global background3
-    global img
+    global main_menu_background
     
 
     if menu == False:
         
-        set(0, 0, img)
+        set(0, 0, main_menu_background)
         textSize(48)
         strokeWeight(4)
         textAlign(CENTER, CENTER)
@@ -285,7 +283,7 @@ def draw():
                 for laser_locs in laser_list:
                     temp = PVector(laser_locs.x + 13, laser_locs.y + 5)
                     dif = PVector.sub(temp,enemies)
-                    if dif.mag() < enemy_size/2:
+                    if dif.mag() < enemy_size/2 and len(laser_list) > 0:
                         laser_list.remove(lasers)
                         enemy_list.remove(enemies)
        
