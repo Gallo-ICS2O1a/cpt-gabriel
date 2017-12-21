@@ -1,8 +1,4 @@
-play1 = False
-play2 = False
-play3 = False
-menu = False
-instructions = False
+screen = "menu"
 x_level1_background = 0
 y_level1_background = 0
 x_level2_background = 0
@@ -29,7 +25,9 @@ boss_hp = 100
 boss_size = 100
 boss = PVector(800 + 100, 600/2)
 boss_speed = PVector(2,0)
-boss_pattern1 = PVector(boss.x - boss_size/2,random(boss.y + player_size/2, boss.y - player_size/2))
+boss_attack1 = PVector(boss.x - boss_size/2,boss.y)
+boss_attack2 = PVector(boss.x - boss_size/2,boss.y)
+boss_attack3 = PVector(boss.x - boss_size/2,boss.y)
 enemy_list = []
 enemy_spawn = False
 pos = PVector(0 + player_size / 2, 300)
@@ -44,6 +42,23 @@ hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
 powerups = False
 
+def retry():
+    global pos
+    global laser_list
+    global lives
+    global x_level1_background
+    global y_level1_background
+    global enemy_list
+    global screen
+    
+    pos = PVector(0 + player_size / 2, 300)
+    laser_list = []
+    lives = 3
+    x_level1_background = 0
+    y_level1_background = 0
+    enemy_list = []
+    play1 = True
+    
 def setup():
     global background1
     global background2
@@ -57,6 +72,7 @@ def setup():
 
 
 def draw():
+    global screen
     global play1
     global play2
     global menu
@@ -90,7 +106,9 @@ def draw():
     global boss_size
     global boss
     global boss_speed
-    global boss_pattern1
+    global boss_attack1
+    global boss_attack2
+    global boss_attack3
     global x_level1_background
     global y_level1_background
     global x_level2_background
@@ -101,7 +119,7 @@ def draw():
     global main_menu_background
     global powerups
 
-    if menu == False:
+    if screen == "menu":
         
         set(0, 0, main_menu_background)
         textSize(48)
@@ -138,8 +156,7 @@ def draw():
             hover_colour1[1] = 206
             hover_colour1[2] = 209
             if click == True:
-                level_1_loadingscreen = True
-                menu = True
+                screen = "level_1_loadingscreen"
 
         if diff_play_sq.x <= -34 or diff_play_sq.x >= 34 or diff_play_sq.y <= -29 or diff_play_sq.y >= 29:
 
@@ -153,7 +170,7 @@ def draw():
             hover_colour2[1] = 206
             hover_colour2[2] = 209
             if click == True:
-                instructions = True
+                screen = "instructions"
 
         if diff_howto_rect.x <= -94 or diff_howto_rect.x >= 94 or diff_howto_rect.y <= -29 or diff_howto_rect.y >= 29:
 
@@ -175,7 +192,7 @@ def draw():
             hover_colour3[1] = 238
             hover_colour3[2] = 238
 
-    if instructions == True:
+    if screen == "instructions":
 
         background(255)
         textSize(48)
@@ -205,14 +222,14 @@ def draw():
             hover_colour4[1] = 206
             hover_colour4[2] = 209
             if click == True:
-                instructions = False
+                screen = "menu"
 
         if diff_back_sq.x <= -35 or diff_back_sq.x >= 35 or diff_back_sq.y <= -25 or diff_back_sq.y >= 25:
             hover_colour4[0] = 175
             hover_colour4[1] = 238
             hover_colour4[2] = 238
 
-    if level_1_loadingscreen == True:
+    if screen = "level_1_loadingscreen":
 
         background(fade_colour, opacity)
         fill(255, 0, 0, opacity)
@@ -225,21 +242,19 @@ def draw():
             fade_colour += 255 / 20
             if fade_colour > 255:
                 fade_colour = 255
-                level_1_loadingscreen = False
                 loading_time = 6
                 opacity = 255
                 fade_colour = 0
-                play1 = True
+                screen = "level1"
                 powerups = True
             if loading_time == 0:
-                level_1_loadingscreen = False
                 loading_time = 6
                 opacity = 255
                 fade_colour = 0
-                play1 = True
+                screen = "level1"
                 powerups = True
 
-    if play1 == True:
+    if screen = "level1":
 
         x_level1_background = constrain(x_level1_background, 0, background1.width - width)
         y_level1_background = constrain(y_level1_background, 0, background1.height - height)
@@ -250,7 +265,7 @@ def draw():
         textSize(30)
         textAlign(BOTTOM, RIGHT)
         text("Lives: " + str(lives), width - 130, height - 30)
-
+        text("Score: " + str(score), width - 770, height - 30)
         fill(255, 0, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
 
@@ -259,8 +274,10 @@ def draw():
 
         if key_down == True:
             pos.y += y_speed
-            
-            
+        
+        if key_space == True:
+            laser_list.append(PVector(pos.x + player_size / 2, pos.y))
+        
         for lasers in laser_list:
             fill(0, 255, 0)
             rect(lasers.x, lasers.y, 26, 10)
@@ -286,15 +303,15 @@ def draw():
             dif1 = PVector.sub(enemies, pos)
             if dif1.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemies)
-                #lives -= 1
+                lives -= 1
             if len(laser_list) > 0:
                 for laser_locs in laser_list:
                     temp = PVector(laser_locs.x + 13, laser_locs.y + 5)
                     dif = PVector.sub(temp,enemies)
                     if dif.mag() < enemy_size/2 and len(laser_list) > 0:
-                        print(dif.mag())
                         laser_list.remove(lasers)
                         enemy_list.remove(enemies)
+                        score += 50
        
         if frameCount > background1.width - 700:
             enemy_spawn = True
@@ -303,22 +320,39 @@ def draw():
             boss.x -= boss_speed.x
             if boss.x <= width - 100:
                 boss_speed.x = 0
-            ellipse(boss_pattern1.x,boss_pattern1.y,30,30)
-            dif2 = PVector.sub(boss,pos)
-            dir = PVector.fromAngle(dif2.heading())
-            boss_attack = PVector.sub(boss_pattern1, dir)
-            move = PVector.sub(enemy_speed,dir)
-            boss_pattern1 = PVector.sub(boss_pattern1,move)
-            if boss_pattern1.x < 0:
-                boss_pattern1.x = boss.x - boss_size/2
-                boss_pattern1.y = random(boss.y + player_size/2, boss.y - player_size/2)
-            print(boss_pattern1)
+            ellipse(boss_attack1.x,boss_attack1.y,20,20)
+            ellipse(boss_attack2.x,boss_attack2.y,20,20)
+            ellipse(boss_attack3.x,boss_attack3.y,20,20)
+            temp1 = PVector.sub(PVector(random(0,200),random(0,height)),boss)
+            dir = PVector.fromAngle(temp1.heading())
+            boss_attack1.x -= dir.x
+            boss_attack1.y -= dir.y
+            print(boss_attack1)
+            print(dir)
+            for laserss in laser_list:
+                temp_dif = PVector(laserss.x + 13, laserss.y + 5)
+                boss_dif = PVector.sub(temp_dif,boss)
+                if boss_dif.mag() < boss_size + sqrt(pow(temp_dif.x,2) + pow(temp_dif.y,2)) and len(laser_list) > 0:
+                    laser_list.remove(lasers)
+                    boss_hp -= 5
+                    if boss_hp <= 0:
+                        boss.x = width + 200
+                        boss.y = -100
+                        level_2_loadingscreen = True
+                        play1 = False
             
-            
-          
         if lives == 0:
-            exit()
-        
+            background(255)
+            textSize(48)
+            fill(0)
+            textAlign(CENTER,CENTER)
+            text("GAME OVER!",width/2,height/2)
+            textSize(30)
+            fill(0,255,0)
+            text("Press Space To Play Again",width/2,height/2 + 50)
+            if key_space == True:
+               retry()
+            
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
 
@@ -421,14 +455,14 @@ def keyPressed():
     if key == CODED:
         if keyCode == UP:
             key_up = True
-
-    if key == CODED:
-        if keyCode == DOWN:
+        elif keyCode == DOWN:
             key_down = True
 
     if key == " ":
         key_space = True
-        laser_list.append(PVector(pos.x + player_size / 2, pos.y))
+        
+        ##########################
+        # MOVE TO DRAW FUNCTION IN APPROPRIATE PLACE
 
 
 def keyReleased():
