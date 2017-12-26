@@ -45,6 +45,8 @@ powerups = False
 
 
 def retry():
+    
+    #Retry function to reset the level
     global pos
     global frames
     global laser_list
@@ -68,6 +70,9 @@ def retry():
     screen = "level_1_loadingscreen"
     
 def setup():
+    
+    #Loads the images (backgrounds) once
+    #Sets the size of the window in which the game is played in to 800 x 600
     global background1
     global background2
     global background3
@@ -121,22 +126,28 @@ def draw():
     global main_menu_background
     global powerups
     
+    
+    #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
         
+        #Calls the image used for the background of the main menu and sets it
         set(0, 0, main_menu_background)
+        #Creates the Title 
         textSize(48)
         strokeWeight(4)
         textAlign(CENTER, CENTER)
         fill(255)
         text("Airplane Shooting Game", width / 2, height / 2 - 50)
-
+        
+        #Creates the rectangles which the menu options are in
         fill(hover_colour1[0], hover_colour1[1], hover_colour1[2])
         rect(width - 110, height - 260, 68, 58)
         fill(hover_colour2[0], hover_colour2[1], hover_colour2[2])
         rect(width - 230, height - 190, 188, 58)
         fill(hover_colour3[0], hover_colour3[1], hover_colour3[2])
         rect(width - 112, height - 120, 68, 58)
-
+        
+        #Menu options
         textSize(28)
         strokeWeight(2)
         textAlign(RIGHT, RIGHT)
@@ -144,19 +155,25 @@ def draw():
         text("Play", width - 50, height - 220)
         text("How To Play", width - 50, height - 150)
         text("Quit", width - 50, height - 80)
-
+        
+        #Finds the center of the rectangles created for the menu options
         center_play_square = PVector(width - 110 + 34, height - 260 + 29)
         center_howto_rect = PVector(width - 230 + 94, height - 190 + 29)
         center_quit_square = PVector(width - 112 + 34, height - 120 + 29)
+        
+        #Calculates the distance between the mouse and the center of the rectangles
         diff_play_sq = PVector(mouseX - center_play_square.x, mouseY - center_play_square.y)
         diff_howto_rect = PVector(mouseX - center_howto_rect.x, mouseY - center_howto_rect.y)
         diff_quit_sq = PVector(mouseX - center_quit_square.x, mouseY - center_quit_square.y)
-
+        
+        #Conditions for if the mouse is hovering over the rectangles, change their colours to let the player know which option they're hovering over
         if diff_play_sq.x >= -34 and diff_play_sq.x <= 34 and diff_play_sq.y >= -29 and diff_play_sq.y <= 29:
 
             hover_colour1[0] = 0
             hover_colour1[1] = 206
             hover_colour1[2] = 209
+            
+            #Checks if the player clicks a certain options; in this case if the play button is clicked, then the first level begins
             if click == True:
                 screen = "level_1_loadingscreen"
 
@@ -171,6 +188,8 @@ def draw():
             hover_colour2[0] = 0
             hover_colour2[1] = 206
             hover_colour2[2] = 209
+            
+            #Checks if the player clicks the instructions, if so, directs them to the instructions screen 
             if click == True:
                 screen = "instructions"
 
@@ -185,6 +204,8 @@ def draw():
             hover_colour3[0] = 0
             hover_colour3[1] = 206
             hover_colour3[2] = 209
+            
+            #Checks if the player clicked exit, if so, exits the game
             if click == True:
                 exit()
 
@@ -194,12 +215,18 @@ def draw():
             hover_colour3[1] = 238
             hover_colour3[2] = 238
 
+    #If the screen is on instructions, do the following things
     if screen == "instructions":
 
+        #Creates the background for the instruction menu
         background(255)
+        
+        #Creates the title
         textSize(48)
         textAlign(CENTER, TOP)
         text("How To Play", width / 2, height / 2 - 250)
+        
+        #How to play rules
         textSize(24)
         textAlign(LEFT)
 
@@ -210,15 +237,20 @@ def draw():
         text("Each level has many enemies. There are 3 levels in total.", 65, 280)
         text("Each enemy defeated adds to your score.", 65, 315)
         text("Each level has a boss at the end. Defeating it clears the level.", 65, 350)
-
+        
+        #Creates the "back" button to return to the main menu
         fill(hover_colour4[0], hover_colour4[1], hover_colour4[2])
         rect(width - 760, height - 80, 70, 50)
         fill(0)
         text("Back", width - 750, height - 50)
 
+        #Finds the center of the back button
         center_back_square = PVector(width - 760 + 35, height - 80 + 25)
+        
+        #Finds the difference between the center of the back button and the player's mouse
         diff_back_sq = PVector(mouseX - center_back_square.x, mouseY - center_back_square.y)
 
+        #Conditions for checking if the mouse is hovering over the back button; if it is, change the colour
         if diff_back_sq.x >= -35 and diff_back_sq.x <= 35 and diff_back_sq.y >= -25 and diff_back_sq.y <= 25:
             hover_colour4[0] = 0
             hover_colour4[1] = 206
@@ -271,13 +303,12 @@ def draw():
         fill(255, 0, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
     
-
-
         if key_up == True:
             pos.y -= y_speed
 
         if key_down == True:
             pos.y += y_speed
+            
         
         for lasers in laser_list:
             fill(0, 255, 0)
@@ -304,7 +335,7 @@ def draw():
             dif1 = PVector.sub(enemies, pos)
             if dif1.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemies)
-                lives -= 1
+                #lives -= 1
             if len(laser_list) > 0:
                 for laser_locs in laser_list:
                     temp = PVector(laser_locs.x + 13, laser_locs.y + 5)
@@ -314,23 +345,28 @@ def draw():
                         enemy_list.remove(enemies)
                         score += 50
        
-        if frames > background1.width - 700:
+        if frames > background1.width - width:
+            
+            #Stops Spawning Enemies
             enemy_spawn = True
+            
+            #Creates the Boss 
             fill(255)
             ellipse(boss.x, boss.y, boss_size,boss_size)
+            
+            #Boss Speed
             boss.x -= boss_speed.x
             if boss.x <= width - 100:
                 boss_speed.x = 0
             ellipse(boss_attack1.x,boss_attack1.y,20,20)
             ellipse(boss_attack2.x,boss_attack2.y,20,20)
             ellipse(boss_attack3.x,boss_attack3.y,20,20)
-            temp1 = PVector.sub(PVector(random(0,200),random(0,height)),boss)
-            dir = PVector.fromAngle(temp1.heading())
-            boss_attack1.x -= dir.x
-            boss_attack1.y -= dir.y
+            PVector.sub(boss_attack1,PVector(random(2,4),random(-3,3)))
+            PVector.sub(boss_attack2,PVector(random(2,4),random(-3,3)))
+            PVector.sub(boss_attack3,PVector(random(2,4),random(-3,3)))
             
-            for laserss in laser_list:
-                temp_dif = PVector(laserss.x + 13, laserss.y + 5)
+            for boss_hit in laser_list:
+                temp_dif = PVector(boss_hit.x + 13, boss_hit.y + 5)
                 boss_dif = PVector.sub(temp_dif,boss)
                 if boss_dif.mag() < boss_size + sqrt(pow(temp_dif.x,2) + pow(temp_dif.y,2)) and len(laser_list) > 0:
                     laser_list.remove(lasers)
@@ -338,8 +374,7 @@ def draw():
                     if boss_hp <= 0:
                         boss.x = width + 200
                         boss.y = -100
-                        level_2_loadingscreen = True
-                        play1 = False
+                        screen = "level_2_loadingscreen"
             
         if lives == 0:
             screen = "gameover"
@@ -353,7 +388,7 @@ def draw():
             textSize(30)
             fill(0,255,0)
             text("Press Space To Play Again",width/2,height/2 + 50)
-            
+                
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
 
@@ -460,7 +495,7 @@ def keyPressed():
         key_space = True
         laser_list.append(PVector(pos.x + player_size / 2, pos.y))
         if screen == "gameover":
-            retry()
+           retry()
         
 
 
