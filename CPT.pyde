@@ -123,6 +123,7 @@ def draw():
     global background2
     global background3
     global main_menu_background
+    global enemy_spawntime
     
     
     #If the screen is on the menu screen (default), then do the following things
@@ -171,7 +172,7 @@ def draw():
             hover_colour1[1] = 206
             hover_colour1[2] = 209
             
-            #Checks if the player clicks a certain options; in this case if the play button is clicked, then the first level begins
+            #Checks if the player clicks a certain option; in this case if the play button is clicked, then the first level begins
             if click == True:
                 screen = "level_1_loadingscreen"
 
@@ -333,15 +334,16 @@ def draw():
         
         #If the enemy_spawn variable is set to false, create enemies and add their randomized spawn location to the list of enemies        
         if enemy_spawn == False:
-            enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*2), random(0 + enemy_size/2, height - enemy_size/2)))
+            enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), random(0 + enemy_size/2, height - enemy_size/2)))
             
         #Checks the length of the enemy_list
-        #If it's greater than 10 stop the spawning of enemies,
-        #Else, if there's less than 10 enemies, spawn more
+        #If it's greater than 10 stop the spawning of enemies, by setting the enemy_spawn variable to true
+        #Every 40 frames, spawn more enemies by setting the enemy_spawn to false
+        
         if len(enemy_list) > 10:
             enemy_spawn = True
         
-        if len(enemy_list) < 10:
+        if frames % 40 == 0:
             enemy_spawn = False
            
        #Creates the enemies
