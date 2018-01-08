@@ -41,12 +41,11 @@ hover_colour1 = [175, 238, 238]
 hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
-powerups = False
 
 
-def retry():
+def retry_level1():
     
-    #Retry function to reset the level
+    #Retry function to reset level 1
     global pos
     global frames
     global laser_list
@@ -124,7 +123,6 @@ def draw():
     global background2
     global background3
     global main_menu_background
-    global powerups
     
     
     #If the screen is on the menu screen (default), then do the following things
@@ -255,6 +253,8 @@ def draw():
             hover_colour4[0] = 0
             hover_colour4[1] = 206
             hover_colour4[2] = 209
+            
+            #If the mouse is hovering over the back button and it is clicked, then return to the menu by setting the screen variable to menu
             if click == True:
                 screen = "menu"
 
@@ -262,89 +262,126 @@ def draw():
             hover_colour4[0] = 175
             hover_colour4[1] = 238
             hover_colour4[2] = 238
-
+    
+    #Checks if the screen variable is equal to the loading screen for level 1
+    #If it is, then do the following things
     if screen == "level_1_loadingscreen":
-
+        
+        #Creates the background for the level 1 loading screen
         background(fade_colour, opacity)
-        fill(255, 0, 0, opacity)
+        fill(255, 0, 0, opacity) 
+        
+        #Creates the "Level 1" text in the middle of the screen
         textSize(58)
         textAlign(CENTER)
         text("LEVEL 1", width / 2, height / 2)
+        
+        #Creates the fadeaway effect for the "Level 1" text
+        #Every 5 frames, reduces the opacity of the text by 255/20,
+        #Increase the fade_colour variable by 255/20, causing the background colour to change until it reaches 255 (black)
         if frames % 5 == 0:
-            loading_time -= 0.001
             opacity -= 255 / 20
             fade_colour += 255 / 20
+            
+            #If the fade_colour variable's value is greater than 255 (black colour), set it to black (255) and change the screen to the first level
+            #When the screen becomes black, it means the fadeaway effect is done, thus the variables used are reset to be used again
             if fade_colour > 255:
                 fade_colour = 255
-                loading_time = 6
                 opacity = 255
                 fade_colour = 0
                 screen = "level1"
-                powerups = True
-            if loading_time == 0:
-                loading_time = 6
-                opacity = 255
-                fade_colour = 0
-                screen = "level1"
-                powerups = True
-
+    
+    #Checks if the screen variable is equal to level1,
+    #If it is, do the following things
     if screen == "level1":
-
+        
+        #Creates the moving background (scrolling background)
         x_level1_background = constrain(x_level1_background, 0, background1.width - width)
         y_level1_background = constrain(y_level1_background, 0, background1.height - height)
         set(-x_level1_background, 0, background1)
         x_level1_background = frames
-
+        
+        #Score and lives text on the bottom of the screen
         fill(255)
         textSize(30)
         textAlign(BOTTOM, RIGHT)
         text("Lives: " + str(lives), width - 130, height - 30)
         text("Score: " + str(score), width - 770, height - 30)
+        
+        #Creates the player
         fill(255, 0, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
     
+        #Checks if the up or down arrow keys are pressed and moves the player in the corresponding directon
         if key_up == True:
             pos.y -= y_speed
 
         if key_down == True:
             pos.y += y_speed
             
-        
+        #Creates the lasers
+        #Loops through the laser_list and draws them (according to their location)
+        #They also have their own speed variable so they move from left to right
         for lasers in laser_list:
             fill(0, 255, 0)
             rect(lasers.x, lasers.y, 26, 10)
             lasers.x += laser_speed
+            
+            #If the lasers reach the end of the screen, removes the laser location from the list
             if lasers.x > width:
                 laser_list.remove(lasers)
-                
+        
+        #If the enemy_spawn variable is set to false, create enemies and add their randomized spawn location to the list of enemies        
         if enemy_spawn == False:
             enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*2), random(0 + enemy_size/2, height - enemy_size/2)))
             
+        #Checks the length of the enemy_list
+        #If it's greater than 10 stop the spawning of enemies,
+        #Else, if there's less than 10 enemies, spawn more
         if len(enemy_list) > 10:
             enemy_spawn = True
         
         if len(enemy_list) < 10:
             enemy_spawn = False
-            
+           
+       #Creates the enemies
+       #Loops through the list of enemies and spawns them based on their location stored in the list
+       #They have their own independent speed to go from right to left (spawns on the right side of the screen) 
         for enemies in enemy_list:
             fill(0)
             ellipse(enemies.x,enemies.y,enemy_size,enemy_size)
             enemies.x -= enemy_speed.x
+            
+            #If the enemies go past the left side of the screen, remove them from the enemy list
             if enemies.x < 0:
                 enemy_list.remove(enemies)
+           
+            #Collision Detection
+            #If an enemy hits the player, the number of lives will decrease by 1 and the enemy will be removed 
             dif1 = PVector.sub(enemies, pos)
             if dif1.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemies)
-                #lives -= 1
+                lives -= 1
+            
+            #If the length of the laser list is greater than 1 (at least one laser has been created)
             if len(laser_list) > 0:
+                
+                #Loops through the laser_list
+                #Finds the centre of the lasers and the difference between the centre of the laser and the centre of the enemies
                 for laser_locs in laser_list:
                     temp = PVector(laser_locs.x + 13, laser_locs.y + 5)
                     dif = PVector.sub(temp,enemies)
+                    
+                    #Checks if the laser hits an enemy
+                    #If the distance between the laser and the enemy is less than the radius of the enemy, while the length of the laser list is greater than 0,
+                    #Remove the laser, remove the enemy, and increase the score by 50 points.
                     if dif.mag() < enemy_size/2 and len(laser_list) > 0:
                         laser_list.remove(lasers)
                         enemy_list.remove(enemies)
                         score += 50
-       
+        
+        #If the frame count is greater than the scrolling picture's background subtracted by the game window width,
+        #Do the following things 
         if frames > background1.width - width:
             
             #Stops Spawning Enemies
@@ -495,7 +532,7 @@ def keyPressed():
         key_space = True
         laser_list.append(PVector(pos.x + player_size / 2, pos.y))
         if screen == "gameover":
-           retry()
+           retry_level1()
         
 
 
