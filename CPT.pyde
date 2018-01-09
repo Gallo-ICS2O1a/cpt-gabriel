@@ -405,7 +405,7 @@ def draw():
                 boss_dif = PVector.sub(boss_attack,pos)
                 push = PVector.fromAngle(boss_dif.heading())
                 push.mult(3)
-                boss_attackspeed = PVector(0,0)
+                boss_attackspeed = PVector(random(0,2),random(0,2))
                 boss_attackspeed.add(push)
                 attacked = True
             
