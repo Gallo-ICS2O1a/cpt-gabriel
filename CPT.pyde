@@ -28,6 +28,7 @@ boss = PVector(800 + 100, 600/2)
 boss_speed = PVector(2,0)
 boss_attack = PVector(boss.x - boss_size/2,boss.y)
 boss_attackspeed = PVector(0,0)
+attacked = False
 enemy_list = []
 enemy_spawn = False
 pos = PVector(0 + player_size / 2, 300)
@@ -40,7 +41,7 @@ hover_colour1 = [175, 238, 238]
 hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
-attacked = False
+
 
 def retry_level1():
     
@@ -365,7 +366,7 @@ def draw():
             dif_playerhit = PVector.sub(enemies, pos)
             if dif_playerhit.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemies)
-                #lives -= 1
+                lives -= 1
             
             #If the length of the laser list is greater than 1 (at least one laser has been created)
             if len(laser_list) > 0:
@@ -373,8 +374,8 @@ def draw():
                 #Loops through the laser_list
                 #Finds the centre of the lasers and the difference between the centre of the laser and the centre of the enemies
                 for laser_locs in laser_list:
-                    centre = PVector(laser_locs.x + 13, laser_locs.y + 5)
-                    dif = PVector.sub(centre,enemies)
+                    centre_enemylaser = PVector(laser_locs.x + 13, laser_locs.y + 5)
+                    dif = PVector.sub(centre_enemylaser,enemies)
                     
                     #Checks if the laser hits an enemy
                     #If the distance between the laser and the enemy is less than the radius of the enemy, while the length of the laser list is greater than 0,
@@ -395,6 +396,10 @@ def draw():
             fill(255)
             ellipse(boss.x, boss.y, boss_size,boss_size)
             
+            fill(255)
+            textSize(24)
+            text("Boss HP:" + boss_hp,boss.x, boss.y + boss_size/2 + 10)
+           
             #Boss Speed
             boss.x -= boss_speed.x
             if boss.x <= width - 100:
@@ -411,7 +416,13 @@ def draw():
             
             ellipse(boss_attack.x,boss_attack.y,20,20)
             boss_attack.sub(boss_attackspeed)
-                
+            
+            boss_hitplayer = PVector.sub(boss_attack,pos)
+            if boss_hitplayer.mag() < player_size/2:
+                lives -= 1
+                boss_attack.x = boss.x
+                boss_attack.y = height/2
+                attacked
                 
             if boss_attack.x < 0:
                 boss_attack.x = boss.x
@@ -419,16 +430,16 @@ def draw():
                 attacked = False
             
             
-            #for boss_hit in laser_list:
-               # temp_dif = PVector(boss_hit.x + 13, boss_hit.y + 5)
-               # boss_dif = PVector.sub(temp_dif,boss)
-               # if boss_dif.mag() < boss_size + sqrt(pow(temp_dif.x,2) + pow(temp_dif.y,2)) and len(laser_list) > 0:
-                   # laser_list.remove(lasers)
-                   # boss_hp -= 5
-                   # if boss_hp <= 0:
-                      #  boss.x = width + 200
-                      #  boss.y = -100
-                       # screen = "level_2_loadingscreen"
+            for boss_hit in laser_list:
+                centre_bosslaser = PVector(boss_hit.x + 13, boss_hit.y + 5)
+                boss_dif = PVector.sub(centre_bosslaser,boss)
+                if boss_dif.mag() < boss_size/2 and len(laser_list) > 0:
+                    laser_list.remove(lasers)
+                    boss_hp -= 5
+                    if boss_hp <= 0:
+                        boss.x = width + 200
+                        boss.y = -100
+                        screen = "level_2_loadingscreen"
             
         if lives == 0:
             screen = "gameover"
