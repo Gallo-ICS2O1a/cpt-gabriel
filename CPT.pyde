@@ -15,6 +15,7 @@ loading_time = 6
 opacity = 255
 fade_colour = 0
 lives = 3
+lives_lost = 0
 score = 0
 y_speed = 5
 laser_speed = 10
@@ -56,17 +57,25 @@ def retry_level1():
     global screen
     global score
     global background1
+    global lives_lost
+    global boss
+    global boss_attack
+    global boss_attackspeed
     
     background1 = loadImage("background3.jpg")
     pos = PVector(0 + player_size / 2, 300)
     laser_list = []
     lives = 3
+    lives_lost -= 3
     x_level1_background = 0
     y_level1_background = 0
     frames = 0
     enemy_list = []
     score = 0
     screen = "level_1_loadingscreen"
+    boss = PVector(800 + 100, 600/2)
+    boss_attack = PVector(boss.x - boss_size/2,boss.y)
+    boss_attackspeed = PVector(0,0)
     attacked = False
     
 def setup():
@@ -90,6 +99,7 @@ def draw():
     global opacity
     global fade_colour
     global lives
+    global lives_lost
     global score
     global y_speed
     global frames
@@ -115,8 +125,6 @@ def draw():
     global boss_speed
     global boss_attack
     global boss_attackspeed
-    global boss_dir
-    global boss_attacklist
     global x_level1_background
     global y_level1_background
     global x_level2_background
@@ -367,6 +375,7 @@ def draw():
             if dif_playerhit.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemies)
                 lives -= 1
+                lives_lost += 1
             
             #If the length of the laser list is greater than 1 (at least one laser has been created)
             if len(laser_list) > 0:
@@ -420,6 +429,7 @@ def draw():
             boss_hitplayer = PVector.sub(boss_attack,pos)
             if boss_hitplayer.mag() < player_size/2:
                 lives -= 1
+                lives_lost += 1
                 boss_attack.x = boss.x
                 boss_attack.y = height/2
                 attacked
