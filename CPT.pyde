@@ -78,6 +78,10 @@ def retry_level1():
     boss_attackspeed = PVector(0,0)
     attacked = False
     
+def retry_level2():
+    
+def retry_level3():
+    
 def setup():
     
     #Loads the images (backgrounds) once
@@ -452,9 +456,9 @@ def draw():
                         screen = "level_2_loadingscreen"
             
         if lives == 0:
-            screen = "gameover"
+            screen = "gameover1"
         
-        if screen == "gameover":
+        if screen == "gameover1":
             background(255)
             textSize(48)
             fill(0)
@@ -569,8 +573,12 @@ def keyPressed():
     if key == " ":
         key_space = True
         laser_list.append(PVector(pos.x + player_size / 2, pos.y))
-        if screen == "gameover":
+        if screen == "gameover1":
            retry_level1()
+        if screen == "gameover2":
+            retry_level2()
+        if screen == "gameover3":
+            retry_level3()
         
 
 
