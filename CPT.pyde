@@ -14,7 +14,7 @@ level_3_loadingscreen = False
 loading_time = 6
 opacity = 255
 fade_colour = 0
-lives = 3
+lives = 5
 lives_lost = 0
 score = 0
 y_speed = 5
@@ -44,7 +44,6 @@ hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
 
-
 def retry_level1():
     
     #Retry function to reset level 1
@@ -67,7 +66,7 @@ def retry_level1():
     background1 = loadImage("background3.jpg")
     pos = PVector(0 + player_size / 2, 300)
     laser_list = []
-    lives = 3
+    lives = 5
     lives_lost -= 3
     x_level1_background = 0
     y_level1_background = 0
@@ -79,6 +78,7 @@ def retry_level1():
     boss_attack = PVector(boss.x - boss_size/2,boss.y)
     boss_attackspeed = PVector(0,0)
     attacked = False
+    
     
 #def retry_level2():
     
@@ -313,7 +313,9 @@ def draw():
     #Checks if the screen variable is equal to level1,
     #If it is, do the following things
     if screen == "level1":
-                
+       
+        time = millis() 
+        
         #Creates the moving background (scrolling background)
         x_level1_background = constrain(x_level1_background, 0, background1.width - width)
         y_level1_background = constrain(y_level1_background, 0, background1.height - height)
@@ -342,15 +344,12 @@ def draw():
         #Loops through the laser_list and draws them (according to their location)
         #They also have their own speed variable so they move from left to right
         if key_space == True:
-            time = millis()
-            last_shot = time
-            if last_shot + 1000 >= time:
+            if time >= last_shot + 500:
                 laser_list.append(PVector(pos.x + player_size / 2, pos.y))
-                key_space = False
                 last_shot = time
+                key_space = False
 
-        print(last_shot)    
-        print(laser_list)
+       
         for lasers in laser_list:
             fill(0, 255, 0)
             rect(lasers.x, lasers.y, 26, 10)
@@ -359,7 +358,8 @@ def draw():
             #If the lasers reach the end of the screen, removes the laser location from the list
             if lasers.x > width:
                 laser_list.remove(lasers)
-        
+                
+            
         #If the enemy_spawn variable is set to false, create enemies and add their randomized spawn location to the list of enemies        
         if enemy_spawn == False:
             enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), random(0 + enemy_size/2, height - enemy_size/2)))
@@ -377,35 +377,35 @@ def draw():
        #Creates the enemies
        #Loops through the list of enemies and spawns them based on their location stored in the list
        #They have their own independent speed to go from right to left (spawns on the right side of the screen) 
-        for enemies in enemy_list:
+        for enemy in enemy_list:
             fill(0)
-            ellipse(enemies.x,enemies.y,enemy_size,enemy_size)
-            enemies.x -= enemy_speed.x
+            ellipse(enemy.x,enemy.y,enemy_size,enemy_size)
+            enemy.x -= enemy_speed.x
             
             #If the enemies go past the left side of the screen, remove them from the enemy list
-            if enemies.x < 0:
-                enemy_list.remove(enemies)
+            if enemy.x < 0:
+                enemy_list.remove(enemy)
            
             #Collision Detection
             #If an enemy hits the player, the number of lives will decrease by 1 and the enemy will be removed 
-            dif_playerhit = PVector.sub(enemies, pos)
+            dif_playerhit = PVector.sub(enemy, pos)
             if dif_playerhit.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
-                enemy_list.remove(enemies)
-                #lives -= 1
-                #lives_lost += 1
+                enemy_list.remove(enemy)
+                lives -= 1
+                lives_lost += 1
             
             #If the length of the laser list is greater than 1 (at least one laser has been created)
             #Loops through the laser_list
             #Finds the centre of the lasers and the difference between the centre of the laser and the centre of the enemies
-            for laser_locs in laser_list:
-                centre_enemylaser = PVector(laser_locs.x + 13, laser_locs.y + 5)
-                dif = PVector.sub(centre_enemylaser,enemies)
+            for lasers in laser_list:
+                centre_enemylaser = PVector(lasers.x + 13, lasers.y + 5)
+                dif = PVector.sub(centre_enemylaser,enemy)
                     
                 #Checks if the laser hits an enemy
                 #If the distance between the laser and the enemy is less than the radius of the enemy, while the length of the laser list is greater than 0,
                 #Remove the laser, remove the enemy, and increase the score by 50 points.
                 if dif.mag() < enemy_size/2 and len(laser_list) > 0:
-                    enemy_list.remove(enemies)
+                    enemy_list.remove(enemy)
                     laser_list.remove(lasers)
                     score += 50
                     break
@@ -434,10 +434,10 @@ def draw():
             if attacked == False:
                 boss_dif = PVector.sub(boss_attack,pos)
                 push = PVector.fromAngle(boss_dif.heading())
-                push.mult(random(3,6))
+                push.mult(random(5,8))
                 boss_attackspeed = PVector(0,0)
                 boss_attackspeed.add(push)
-                attacked = True
+                
             
             ellipse(boss_attack.x,boss_attack.y,20,20)
             boss_attack.sub(boss_attackspeed)
@@ -448,7 +448,7 @@ def draw():
                 lives_lost += 1
                 boss_attack.x = boss.x
                 boss_attack.y = height/2
-                attacked
+                attacked = False
                 
             if boss_attack.x < 0:
                 boss_attack.x = boss.x
@@ -456,12 +456,13 @@ def draw():
                 attacked = False
             
             
-            for boss_hit in laser_list:
-                centre_bosslaser = PVector(boss_hit.x + 13, boss_hit.y + 5)
+            for lasers in laser_list:
+                centre_bosslaser = PVector(lasers.x + 13, lasers.y + 5)
                 boss_dif = PVector.sub(centre_bosslaser,boss)
-                if boss_dif.mag() < boss_size/2 and len(laser_list) > 0:
+                if boss_dif.mag() < boss_size/2:
                     laser_list.remove(lasers)
                     boss_hp -= 5
+                    break
                                        
                         #screen = "level_2_loadingscreen"
         if boss_hp <= 0:
