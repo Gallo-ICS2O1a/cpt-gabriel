@@ -43,7 +43,9 @@ hover_colour1 = [175, 238, 238]
 hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
-
+powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
+powerup_speed = PVector(random(2,4),0)
+powerup = False
 def retry_level1():
     
     #Retry function to reset level 1
@@ -142,7 +144,9 @@ def draw():
     global main_menu_background
     global enemy_spawntime
     global attacked
-    
+    global powerup_heart
+    global powerup_speed
+    global powerup
     
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
@@ -391,7 +395,7 @@ def draw():
             dif_playerhit = PVector.sub(enemy, pos)
             if dif_playerhit.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemy)
-                lives -= 1
+                #lives -= 1
                 lives_lost += 1
             
             #If the length of the laser list is greater than 1 (at least one laser has been created)
@@ -409,6 +413,15 @@ def draw():
                     laser_list.remove(lasers)
                     score += 50
                     break
+        fill(255,0,0)        
+        if frames >= random(width + 200, background1.width - width):
+            powerup = True
+            
+        if powerup == True:    
+            ellipse(powerup_heart.x,powerup_heart.y,50,50)
+        
+        powerup_heart.sub(powerup_speed)  
+            
         
         #If the frame count is greater than the scrolling picture's background subtracted by the game window width (boss area),
         #Do the following things 
@@ -425,6 +438,13 @@ def draw():
             textSize(24)
             text("Boss HP: " + str(boss_hp),boss.x - boss_size/2 - 10, boss.y + boss_size/2 + 20)
            
+           
+            if boss_hp <= 0:
+                boss.y += 2 
+                boss_attackspeed = PVector(0,0)
+                boss_attack = PVector(width + 100, height + 100)
+                attacked = True
+                           
             #Boss Speed
             boss.x -= boss_speed.x
             if boss.x <= width - 100:
@@ -437,14 +457,14 @@ def draw():
                 push.mult(random(5,8))
                 boss_attackspeed = PVector(0,0)
                 boss_attackspeed.add(push)
-                
+                attacked = True
             
             ellipse(boss_attack.x,boss_attack.y,20,20)
             boss_attack.sub(boss_attackspeed)
-            
             boss_hitplayer = PVector.sub(boss_attack,pos)
+            
             if boss_hitplayer.mag() < player_size/2:
-                lives -= 1
+                #lives -= 1
                 lives_lost += 1
                 boss_attack.x = boss.x
                 boss_attack.y = height/2
@@ -464,11 +484,10 @@ def draw():
                     boss_hp -= 5
                     break
                                        
-                        #screen = "level_2_loadingscreen"
-        if boss_hp <= 0:
-            boss.y += 5    
-            boss_attackspeed = 0
-               
+
+
+            
+        
         if lives == 0:
             screen = "gameover1"
         
