@@ -440,7 +440,7 @@ def draw():
             dif_playerhit = PVector.sub(enemy, pos)
             if dif_playerhit.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
                 enemy_list.remove(enemy)
-                #lives -= 1
+                lives -= 1
                 lives_lost += 1
             
             #If the length of the laser list is greater than 1 (at least one laser has been created)
@@ -553,7 +553,7 @@ def draw():
             boss_hitplayer = PVector.sub(boss_attack,pos)
 
             if boss_hitplayer.mag() < player_size/2:
-                #lives -= 1
+                lives -= 1
                 lives_lost += 1
                 boss_attack.x = boss.x
                 boss_attack.y = height/2
