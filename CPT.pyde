@@ -24,6 +24,7 @@ last_shot = 0
 player_size = 50
 enemy_size = 40
 enemy_speed = PVector(3,0)
+enemy_kill_score = 50
 boss_hp = 100
 boss_size = 100
 boss = PVector(800 + 100, 600/2)
@@ -45,9 +46,15 @@ hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
 powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
 powerup_speed = PVector(random(2,4),0)
-powerup = False
-powerup_trigger = random(frames + 500, frames + 2000)
+powerup_heart_spawn = False
+powerup_heart_trigger = random(frames + 500, frames + 2000)
 powerup_size = 30
+powerup_scoremultiply_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
+powerup_scoremultiply_trigger = random(frames + 200, frames + 3000)
+powerup_scoremultiply = 2
+powerup_scoremultiply_time = 20
+powerup_scoremultiply_spawn = False
+countdown = False
 
 def retry_level1():
     
@@ -89,18 +96,31 @@ def retry_level1():
     
 #def retry_level3():
     
+def powerup_scoremultiply_reset():
+    
+    global frames
+    global powerup_scoremultiply_spawn
+    global powerup_speed
+    global powerup_scoremultiply_loc
+    global powerup_scoremultiply_trigger
+    
+    powerup_speed = PVector(random(2,4),0)
+    powerup_scoremultiply_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
+    powerup_scoremultiply_trigger = powerup_scoremultiply_trigger = random(frames + 200, frames + 3000)
+    powerup_scoremultiply_spawn = False
+    
 def powerup_heart_reset():
     
     global frames
-    global powerup
+    global powerup_heart_spawn
     global powerup_speed
     global powerup_heart
-    global powerup_trigger
+    global powerup_heart_trigger
     
-    powerup = False
+    powerup_heart_spawn = False
     powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
     powerup_speed = PVector(random(2,4),0)
-    powerup_trigger = random(frames + 500, frames + 2000)
+    powerup_heart_trigger = random(frames + 500, frames + 2000)
 
 def setup():
     
@@ -140,6 +160,7 @@ def draw():
     global hover_colour3
     global hover_colour4
     global click
+    global enemy_kill_score
     global enemy_size
     global enemy_speed
     global enemy_list
@@ -162,9 +183,15 @@ def draw():
     global attacked
     global powerup_heart
     global powerup_speed
-    global powerup
-    global powerup_trigger
+    global powerup_heart_spawn
+    global powerup_heart_trigger
     global powerup_size
+    global powerup_scoremultiply
+    global powerup_scoremultiply_trigger
+    global powerup_scoremultiply_time
+    global powerup_scoremultiply_loc
+    global powerup_scoremultiply_spawn
+    global countdown
     
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
@@ -429,28 +456,59 @@ def draw():
                 if dif.mag() < enemy_size/2 and len(laser_list) > 0:
                     enemy_list.remove(enemy)
                     laser_list.remove(lasers)
-                    score += 50
+                    if countdown == True:
+                        score += enemy_kill_score * powerup_scoremultiply
+                    else:
+                        score += 50
                     break
                 
              
         fill(255,0,0)      
-        if frames >= powerup_trigger:    
+        if frames >= powerup_heart_trigger:    
             ellipse(powerup_heart.x,powerup_heart.y,powerup_size,powerup_size)
-            powerup = True
+            powerup_heart_spawn = True
             
-        if powerup == True:
+        if powerup_heart_spawn == True:
             powerup_heart.sub(powerup_speed) 
             
         if powerup_heart.x < 0:
             powerup_heart_reset() 
             
-        powerup_dif = PVector.sub(pos,powerup_heart)
-        if powerup_dif.mag() < player_size/2 + powerup_size/2:
+        powerup_heart_dif = PVector.sub(pos,powerup_heart)
+        if powerup_heart_dif.mag() < player_size/2 + powerup_size/2:
             if lives == 5:
                 score += 200
             else:
                 lives += 1
             powerup_heart_reset()
+            
+        fill(0,0,255)
+        if frames >= powerup_scoremultiply_trigger:
+            ellipse(powerup_scoremultiply_loc.x,powerup_scoremultiply_loc.y,powerup_size,powerup_size)
+            powerup_scoremultiply_spawn = True
+        
+        if powerup_scoremultiply_spawn == True:
+            powerup_scoremultiply_loc.sub(powerup_speed)
+        
+        if powerup_scoremultiply_loc.x < 0:
+            powerup_scoremultiply_reset()
+        
+        powerup_score_dif = PVector.sub(pos,powerup_scoremultiply_loc)
+        if powerup_score_dif.mag() < player_size/2 + powerup_size/2:
+            countdown = True
+            powerup_scoremultiply_reset()
+            print(powerup_scoremultiply_time)
+            
+        if countdown == True:  
+            textSize(30)
+            textAlign(BOTTOM, CENTER)
+            text("x2 Score Time :" + str(powerup_scoremultiply_time),width/2, height - 30)   
+            if frames % 60 == 0:
+                powerup_scoremultiply_time -= 1    
+                print(powerup_scoremultiply_time)
+                if powerup_scoremultiply_time == 0:
+                    powerup_scoremultiply_time = 20
+                    countdown = False
             
         
         #If the frame count is greater than the scrolling picture's background subtracted by the game window width (boss area),
@@ -466,7 +524,7 @@ def draw():
             
             fill(255)
             textSize(24)
-            text("Boss HP: " + str(boss_hp),boss.x - boss_size/2 - 10, boss.y + boss_size/2 + 20)
+            text("Boss HP: " + str(boss_hp),boss.x - boss_size/2 - 13, boss.y + boss_size/2 + 25)
            
            
             if boss_hp <= 0:
