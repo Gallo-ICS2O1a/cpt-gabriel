@@ -453,7 +453,7 @@ def draw():
                 #Checks if the laser hits an enemy
                 #If the distance between the laser and the enemy is less than the radius of the enemy, while the length of the laser list is greater than 0,
                 #Remove the laser, remove the enemy, and increase the score by 50 points.
-                if dif.mag() < enemy_size/2 and len(laser_list) > 0:
+                if dif.mag() < enemy_size/2:
                     enemy_list.remove(enemy)
                     laser_list.remove(lasers)
                     if countdown == True:
@@ -499,13 +499,13 @@ def draw():
             powerup_scoremultiply_reset()
             print(powerup_scoremultiply_time)
             
-        if countdown == True:  
+        if countdown == True:
+            fill(255)  
             textSize(30)
             textAlign(BOTTOM, CENTER)
-            text("x2 Score Time :" + str(powerup_scoremultiply_time),width/2, height - 30)   
+            text("x2 Score Time :" + str(powerup_scoremultiply_time),width/2 - 120, height - 45)   
             if frames % 60 == 0:
                 powerup_scoremultiply_time -= 1    
-                print(powerup_scoremultiply_time)
                 if powerup_scoremultiply_time == 0:
                     powerup_scoremultiply_time = 20
                     countdown = False
@@ -528,6 +528,7 @@ def draw():
            
            
             if boss_hp <= 0:
+                score += 500
                 boss.y += 2 
                 boss_attackspeed = PVector(0,0)
                 boss_attack = PVector(width + 100, height + 100)
@@ -550,45 +551,40 @@ def draw():
             ellipse(boss_attack.x,boss_attack.y,20,20)
             boss_attack.sub(boss_attackspeed)
             boss_hitplayer = PVector.sub(boss_attack,pos)
-            
+
             if boss_hitplayer.mag() < player_size/2:
                 #lives -= 1
                 lives_lost += 1
                 boss_attack.x = boss.x
                 boss_attack.y = height/2
                 attacked = False
-                
+
             if boss_attack.x < 0:
                 boss_attack.x = boss.x
                 boss_attack.y = height/2
                 attacked = False
-            
-            
+
             for lasers in laser_list:
                 centre_bosslaser = PVector(lasers.x + 13, lasers.y + 5)
-                boss_dif = PVector.sub(centre_bosslaser,boss)
+                boss_dif = PVector.sub(centre_bosslaser, boss)
                 if boss_dif.mag() < boss_size/2:
                     laser_list.remove(lasers)
                     boss_hp -= 5
                     break
-                                       
-
-
-            
-        
+                        
         if lives == 0:
             screen = "gameover1"
-        
+
         if screen == "gameover1":
             background(255)
             textSize(48)
             fill(0)
-            textAlign(CENTER,CENTER)
-            text("GAME OVER!",width/2,height/2)
+            textAlign(CENTER, CENTER)
+            text("GAME OVER!", width/2, height/2)
             textSize(30)
-            fill(0,255,0)
-            text("Press Space To Play Again",width/2,height/2 + 50)
-                
+            fill(0, 255, 0)
+            text("Press Space To Play Again", width/2, height/2 + 50)
+
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
 
@@ -619,8 +615,10 @@ def draw():
 
     if screen == "level2":
 
-        x_level2_background = constrain(x_level2_background, 0, background2.width - width)
-        y_level2_background = constrain(y_level2_background, 0, background2.height - height)
+        x_level2_background = constrain(x_level2_background, 0,
+                                        background2.width - width)
+        y_level2_background = constrain(y_level2_background, 0,
+                                        background2.height - height)
         set(-x_level2_background, 0, background2)
         x_level2_background = frames
         fill(255)
@@ -631,10 +629,10 @@ def draw():
         fill(255, 0, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
 
-        if key_up == True:
+        if key_up is True:
             pos.y -= y_speed
 
-        if key_down == True:
+        if key_down is True:
             pos.y += y_speed
 
         for lasers in laser_list:
@@ -666,13 +664,15 @@ def draw():
                 screen = "level3"
             if loading_time == 0:
                 screen = "level3"
-                
+
     frames += 1
+
 
 def mousePressed():
     global click
     if mouseButton == LEFT:
         click = True
+
 
 def mouseReleased():
     global click
@@ -694,14 +694,13 @@ def keyPressed():
 
     if key == " ":
         key_space = True
-        
+
         if screen == "gameover1":
-           retry_level1()
+            retry_level1()
         if screen == "gameover2":
             retry_level2()
         if screen == "gameover3":
             retry_level3()
-        
 
 
 def keyReleased():
