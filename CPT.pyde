@@ -46,6 +46,9 @@ hover_colour4 = [175, 238, 238]
 powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
 powerup_speed = PVector(random(2,4),0)
 powerup = False
+powerup_trigger = random(frames + 500, frames + 2000)
+powerup_size = 30
+
 def retry_level1():
     
     #Retry function to reset level 1
@@ -86,6 +89,19 @@ def retry_level1():
     
 #def retry_level3():
     
+def powerup_heart_reset():
+    
+    global frames
+    global powerup
+    global powerup_speed
+    global powerup_heart
+    global powerup_trigger
+    
+    powerup = False
+    powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
+    powerup_speed = PVector(random(2,4),0)
+    powerup_trigger = random(frames + 500, frames + 2000)
+
 def setup():
     
     #Loads the images (backgrounds) once
@@ -147,6 +163,8 @@ def draw():
     global powerup_heart
     global powerup_speed
     global powerup
+    global powerup_trigger
+    global powerup_size
     
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
@@ -413,14 +431,26 @@ def draw():
                     laser_list.remove(lasers)
                     score += 50
                     break
-        fill(255,0,0)        
-        if frames >= random(width + 200, background1.width - width):
+                
+             
+        fill(255,0,0)      
+        if frames >= powerup_trigger:    
+            ellipse(powerup_heart.x,powerup_heart.y,powerup_size,powerup_size)
             powerup = True
             
-        if powerup == True:    
-            ellipse(powerup_heart.x,powerup_heart.y,50,50)
-        
-        powerup_heart.sub(powerup_speed)  
+        if powerup == True:
+            powerup_heart.sub(powerup_speed) 
+            
+        if powerup_heart.x < 0:
+            powerup_heart_reset() 
+            
+        powerup_dif = PVector.sub(pos,powerup_heart)
+        if powerup_dif.mag() < player_size/2 + powerup_size/2:
+            if lives == 5:
+                score += 200
+            else:
+                lives += 1
+            powerup_heart_reset()
             
         
         #If the frame count is greater than the scrolling picture's background subtracted by the game window width (boss area),
