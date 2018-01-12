@@ -413,144 +413,155 @@ def draw():
         if enemy_spawn == False:
             enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), random(0 + enemy_size/2, height - enemy_size/2)))
             
-        #Checks the length of the enemy_list
-        #If it's greater than 10 stop the spawning of enemies, by setting the enemy_spawn variable to true
-        #Every 40 frames, spawn more enemies by setting the enemy_spawn to false
-        
+        # Checks the length of the enemy_list
+        # If it's greater than 10 stop the spawning of enemies,
+        # by setting the enemy_spawn variable to true
+        # Every 40 frames, spawn more enemies
+        # by setting the enemy_spawn variable to false
+
         if len(enemy_list) > 10:
             enemy_spawn = True
-        
+
         if frames % 40 == 0:
             enemy_spawn = False
-           
-       #Creates the enemies
-       #Loops through the list of enemies and spawns them based on their location stored in the list
-       #They have their own independent speed to go from right to left (spawns on the right side of the screen) 
+
+        # Creates the enemies
+        # Loops through the list of enemies
+        # and spawns them based on their location stored in the list
+        # They have their own independent speed
+        # Go from right to left (spawns on the right side of the screen)
         for enemy in enemy_list:
             fill(0)
-            ellipse(enemy.x,enemy.y,enemy_size,enemy_size)
+            ellipse(enemy.x, enemy.y, enemy_size, enemy_size)
             enemy.x -= enemy_speed.x
-            
-            #If the enemies go past the left side of the screen, remove them from the enemy list
+
+            # If the enemies go past the left side of the screen,
+            # remove them from the enemy list
             if enemy.x < 0:
                 enemy_list.remove(enemy)
-           
-            #Collision Detection
-            #If an enemy hits the player, the number of lives will decrease by 1 and the enemy will be removed 
+
+            # Collision Detection
+            # If an enemy hits the player,
+            # the number of lives will decrease by 1
+            # and the enemy will be removed
             dif_playerhit = PVector.sub(enemy, pos)
-            if dif_playerhit.mag() < player_size/2 + enemy_size/2 and len(enemy_list) > 0:
+            if dif_playerhit.mag() < player_size/2 + enemy_size/2:
                 enemy_list.remove(enemy)
                 lives -= 1
                 lives_lost += 1
-            
-            #If the length of the laser list is greater than 1 (at least one laser has been created)
-            #Loops through the laser_list
-            #Finds the centre of the lasers and the difference between the centre of the laser and the centre of the enemies
+
+            # Loops through the laser_list
+            # Finds the centre of the lasers
+            # and the difference between the centre of the laser
+            # and the centre of the enemies
             for lasers in laser_list:
                 centre_enemylaser = PVector(lasers.x + 13, lasers.y + 5)
-                dif = PVector.sub(centre_enemylaser,enemy)
-                    
-                #Checks if the laser hits an enemy
-                #If the distance between the laser and the enemy is less than the radius of the enemy, while the length of the laser list is greater than 0,
-                #Remove the laser, remove the enemy, and increase the score by 50 points.
+                dif = PVector.sub(centre_enemylaser, enemy)
+
+                # Checks if the laser hits an enemy
+                # If the distance between the laser
+                # and the enemy is less than the radius of the enemy,
+                # Remove the laser, remove the enemy,
+                # and increase the score by 50 points.
                 if dif.mag() < enemy_size/2:
                     enemy_list.remove(enemy)
                     laser_list.remove(lasers)
-                    if countdown == True:
+                    if countdown is True:
                         score += enemy_kill_score * powerup_scoremultiply
                     else:
                         score += 50
                     break
-                
-             
-        fill(255,0,0)      
-        if frames >= powerup_heart_trigger:    
-            ellipse(powerup_heart.x,powerup_heart.y,powerup_size,powerup_size)
+
+        fill(255, 0, 0)
+        if frames >= powerup_heart_trigger:
+            ellipse(powerup_heart.x, powerup_heart.y,
+                    powerup_size, powerup_size)
             powerup_heart_spawn = True
-            
-        if powerup_heart_spawn == True:
-            powerup_heart.sub(powerup_speed) 
-            
+
+        if powerup_heart_spawn is True:
+            powerup_heart.sub(powerup_speed)
+
         if powerup_heart.x < 0:
-            powerup_heart_reset() 
-            
-        powerup_heart_dif = PVector.sub(pos,powerup_heart)
+            powerup_heart_reset()
+
+        powerup_heart_dif = PVector.sub(pos, powerup_heart)
         if powerup_heart_dif.mag() < player_size/2 + powerup_size/2:
             if lives == 5:
                 score += 200
             else:
                 lives += 1
             powerup_heart_reset()
-            
-        fill(0,0,255)
+
+        fill(0, 0, 255)
         if frames >= powerup_scoremultiply_trigger:
-            ellipse(powerup_scoremultiply_loc.x,powerup_scoremultiply_loc.y,powerup_size,powerup_size)
+            ellipse(powerup_scoremultiply_loc.x, powerup_scoremultiply_loc.y,
+                    powerup_size, powerup_size)
             powerup_scoremultiply_spawn = True
-        
-        if powerup_scoremultiply_spawn == True:
+
+        if powerup_scoremultiply_spawn is True:
             powerup_scoremultiply_loc.sub(powerup_speed)
-        
+
         if powerup_scoremultiply_loc.x < 0:
             powerup_scoremultiply_reset()
-        
-        powerup_score_dif = PVector.sub(pos,powerup_scoremultiply_loc)
+
+        powerup_score_dif = PVector.sub(pos, powerup_scoremultiply_loc)
         if powerup_score_dif.mag() < player_size/2 + powerup_size/2:
             countdown = True
             powerup_scoremultiply_reset()
             print(powerup_scoremultiply_time)
-            
-        if countdown == True:
-            fill(255)  
+
+        if countdown is True:
+            fill(255)
             textSize(30)
             textAlign(BOTTOM, CENTER)
-            text("x2 Score Time :" + str(powerup_scoremultiply_time),width/2 - 120, height - 45)   
+            text("x2 Score Time :" + str(powerup_scoremultiply_time),
+                 width/2 - 120, height - 45)
             if frames % 60 == 0:
-                powerup_scoremultiply_time -= 1    
+                powerup_scoremultiply_time -= 1
                 if powerup_scoremultiply_time == 0:
                     powerup_scoremultiply_time = 20
                     countdown = False
-            
-        
-        #If the frame count is greater than the scrolling picture's background subtracted by the game window width (boss area),
-        #Do the following things 
+
+        # If the frame count is greater than the scrolling picture's background
+        # Subtracted by the game window width (boss area),
+        # Do the following things
         if frames > background1.width - width:
-            
-            #Stops Spawning Enemies
+
+            # Stops Spawning Enemies
             enemy_spawn = True
-            
-            #Creates the Boss 
+
+            # Creates the Boss
             fill(255)
-            ellipse(boss.x, boss.y, boss_size,boss_size)
-            
+            ellipse(boss.x, boss.y, boss_size, boss_size)
+
             fill(255)
             textSize(24)
-            text("Boss HP: " + str(boss_hp),boss.x - boss_size/2 - 13, boss.y + boss_size/2 + 25)
-           
-           
+            text("Boss HP: " + str(boss_hp), boss.x - boss_size/2 - 13,
+                 boss.y + boss_size/2 + 25)
+
             if boss_hp <= 0:
                 score += 500
-                boss.y += 2 
-                boss_attackspeed = PVector(0,0)
+                boss.y += 2
+                boss_attackspeed = PVector(0, 0)
                 boss_attack = PVector(width + 100, height + 100)
                 attacked = True
-                           
-            #Boss Speed
+
+            # Boss Speed
             boss.x -= boss_speed.x
             if boss.x <= width - 100:
                 boss_speed.x = 0
-                
-    
-            if attacked == False:
-                boss_dif = PVector.sub(boss_attack,pos)
+
+            if attacked is False:
+                boss_dif = PVector.sub(boss_attack, pos)
                 push = PVector.fromAngle(boss_dif.heading())
-                push.mult(random(5,8))
-                boss_attackspeed = PVector(0,0)
+                push.mult(random(5, 8))
+                boss_attackspeed = PVector(0, 0)
                 boss_attackspeed.add(push)
                 attacked = True
-            
-            ellipse(boss_attack.x,boss_attack.y,20,20)
+
+            ellipse(boss_attack.x, boss_attack.y, 20, 20)
             boss_attack.sub(boss_attackspeed)
-            boss_hitplayer = PVector.sub(boss_attack,pos)
+            boss_hitplayer = PVector.sub(boss_attack, pos)
 
             if boss_hitplayer.mag() < player_size/2:
                 lives -= 1
@@ -571,7 +582,7 @@ def draw():
                     laser_list.remove(lasers)
                     boss_hp -= 5
                     break
-                        
+
         if lives == 0:
             screen = "gameover1"
 
