@@ -8,6 +8,8 @@ background1 = loadImage("background3.jpg")
 background2 = loadImage("background4.jpg")
 background3 = 0
 main_menu_background = loadImage("background.jpg")
+gif = loadImage("powerup_score.gif")
+gif2 = loadImage("powerup_heart.gif")
 level_1_loadingscreen = False
 level_2_loadingscreen = False
 level_3_loadingscreen = False
@@ -48,7 +50,7 @@ powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
 powerup_speed = PVector(random(2,4),0)
 powerup_heart_spawn = False
 powerup_heart_trigger = random(frames + 500, frames + 2000)
-powerup_size = 30
+powerup_size = 45
 powerup_scoremultiply_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
 powerup_scoremultiply_trigger = random(frames + 200, frames + 3000)
 powerup_scoremultiply = 2
@@ -130,12 +132,14 @@ def setup():
     global background2
     global background3
     global main_menu_background
+    global gif
+    global gif2
     size(800, 600)
     background1 = loadImage("background3.jpg")
     background2 = loadImage("background4.jpg")
     main_menu_background = loadImage("background.jpg")
-
-
+    gif = loadImage("powerup_score.gif")
+    gif2 = loadImage("powerup_heart.gif")
 
 def draw():
     global screen
@@ -192,6 +196,8 @@ def draw():
     global powerup_scoremultiply_loc
     global powerup_scoremultiply_spawn
     global countdown
+    global gif
+    global gif2
     
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
@@ -364,12 +370,13 @@ def draw():
     if screen == "level1":
        
         time = millis() 
-        
         #Creates the moving background (scrolling background)
         x_level1_background = constrain(x_level1_background, 0, background1.width - width)
         y_level1_background = constrain(y_level1_background, 0, background1.height - height)
         set(-x_level1_background, 0, background1)
         x_level1_background = frames
+        gif.resize(powerup_size,powerup_size)
+        gif2.resize(powerup_size,powerup_size)
         
         #Score and lives text on the bottom of the screen
         fill(255)
@@ -382,6 +389,8 @@ def draw():
         fill(255, 0, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
     
+        
+        
         #Checks if the up or down arrow keys are pressed and moves the player in the corresponding directon
         if key_up == True:
             pos.y -= y_speed
@@ -469,13 +478,12 @@ def draw():
                     if countdown is True:
                         score += enemy_kill_score * powerup_scoremultiply
                     else:
-                        score += 50
+                        score += enemy_kill_score
                     break
 
         fill(255, 0, 0)
         if frames >= powerup_heart_trigger:
-            ellipse(powerup_heart.x, powerup_heart.y,
-                    powerup_size, powerup_size)
+            image(gif2,powerup_heart.x,powerup_heart.y)
             powerup_heart_spawn = True
 
         if powerup_heart_spawn is True:
@@ -494,8 +502,7 @@ def draw():
 
         fill(0, 0, 255)
         if frames >= powerup_scoremultiply_trigger:
-            ellipse(powerup_scoremultiply_loc.x, powerup_scoremultiply_loc.y,
-                    powerup_size, powerup_size)
+            image(gif,powerup_scoremultiply_loc.x,powerup_scoremultiply_loc.y)
             powerup_scoremultiply_spawn = True
 
         if powerup_scoremultiply_spawn is True:
