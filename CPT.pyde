@@ -8,8 +8,8 @@ background1 = loadImage("background3.jpg")
 background2 = loadImage("background4.jpg")
 background3 = 0
 main_menu_background = loadImage("background.jpg")
-gif = loadImage("powerup_score.gif")
-gif2 = loadImage("powerup_heart.gif")
+powerup_scorepic = loadImage("powerup_score.gif")
+powerup_heartpic = loadImage("powerup_heart.gif")
 level_1_loadingscreen = False
 level_2_loadingscreen = False
 level_3_loadingscreen = False
@@ -132,14 +132,14 @@ def setup():
     global background2
     global background3
     global main_menu_background
-    global gif
-    global gif2
+    global powerup_scorepic
+    global powerup_heartpic
     size(800, 600)
     background1 = loadImage("background3.jpg")
     background2 = loadImage("background4.jpg")
     main_menu_background = loadImage("background.jpg")
-    gif = loadImage("powerup_score.gif")
-    gif2 = loadImage("powerup_heart.gif")
+    powerup_scorepic = loadImage("powerup_score.gif")
+    powerup_heartpic = loadImage("powerup_heart.gif")
 
 def draw():
     global screen
@@ -196,8 +196,8 @@ def draw():
     global powerup_scoremultiply_loc
     global powerup_scoremultiply_spawn
     global countdown
-    global gif
-    global gif2
+    global powerup_scorepic
+    global powerup_heartpic
     
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
@@ -375,8 +375,8 @@ def draw():
         y_level1_background = constrain(y_level1_background, 0, background1.height - height)
         set(-x_level1_background, 0, background1)
         x_level1_background = frames
-        gif.resize(powerup_size,powerup_size)
-        gif2.resize(powerup_size,powerup_size)
+        powerup_scorepic.resize(powerup_size,powerup_size)
+        powerup_heartpic.resize(powerup_size,powerup_size)
         
         #Score and lives text on the bottom of the screen
         fill(255)
@@ -483,7 +483,7 @@ def draw():
 
         fill(255, 0, 0)
         if frames >= powerup_heart_trigger:
-            image(gif2,powerup_heart.x,powerup_heart.y)
+            image(powerup_heartpic,powerup_heart.x,powerup_heart.y)
             powerup_heart_spawn = True
 
         if powerup_heart_spawn is True:
@@ -502,7 +502,7 @@ def draw():
 
         fill(0, 0, 255)
         if frames >= powerup_scoremultiply_trigger:
-            image(gif,powerup_scoremultiply_loc.x,powerup_scoremultiply_loc.y)
+            image(powerup_scorepic,powerup_scoremultiply_loc.x,powerup_scoremultiply_loc.y)
             powerup_scoremultiply_spawn = True
 
         if powerup_scoremultiply_spawn is True:
@@ -546,13 +546,6 @@ def draw():
             text("Boss HP: " + str(boss_hp), boss.x - boss_size/2 - 13,
                  boss.y + boss_size/2 + 25)
 
-            if boss_hp <= 0:
-                score += 500
-                boss.y += 2
-                boss_attackspeed = PVector(0, 0)
-                boss_attack = PVector(width + 100, height + 100)
-                attacked = True
-
             # Boss Speed
             boss.x -= boss_speed.x
             if boss.x <= width - 100:
@@ -589,7 +582,14 @@ def draw():
                     laser_list.remove(lasers)
                     boss_hp -= 5
                     break
-
+            
+            if boss_hp <= 0:
+                score += 500
+                boss.y += 2
+                boss_attackspeed = PVector(0, 0)
+                boss_attack = PVector(width + 100, height + 100)
+                attacked = True
+                
         if lives == 0:
             screen = "gameover1"
 
