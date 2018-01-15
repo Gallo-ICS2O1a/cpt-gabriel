@@ -489,18 +489,29 @@ def draw():
                     else:
                         score += enemy_kill_score
                     break
-
+        
+        # Powerups
         fill(255, 0, 0)
+        # If the frames passed the powerup (heart) trigger
+        # Spawn the heart powerup randomly
         if frames >= powerup_heart_trigger:
             image(powerup_heartpic,powerup_heart.x,powerup_heart.y)
             powerup_heart_spawn = True
 
+        # Heart powerup movement
         if powerup_heart_spawn is True:
             powerup_heart.sub(powerup_speed)
-
+        
+        # If powerup goes off the screen, reset it
         if powerup_heart.x < 0:
             powerup_heart_reset()
 
+
+        # Collision detection with player
+        # If collides, and player has full health,
+        # Add 200 to the score
+        # Otherwise add 1 to lives
+        # After colliding, reset the powerup
         powerup_heart_dif = PVector.sub(pos, powerup_heart)
         if powerup_heart_dif.mag() < player_size/2 + powerup_size/2:
             if lives == 5:
@@ -508,30 +519,43 @@ def draw():
             else:
                 lives += 1
             powerup_heart_reset()
-
+        
+        # If the frames has passed the scoremultiply powerup trigger
+        # Start spawning this powerup
         fill(0, 0, 255)
         if frames >= powerup_scoremultiply_trigger:
             image(powerup_scorepic,powerup_scoremultiply_loc.x,powerup_scoremultiply_loc.y)
             powerup_scoremultiply_spawn = True
-
+        
+        # Movement of powerup
         if powerup_scoremultiply_spawn is True:
             powerup_scoremultiply_loc.sub(powerup_speed)
 
+        # If powerup goes off screen, reset it
         if powerup_scoremultiply_loc.x < 0:
             powerup_scoremultiply_reset()
 
+
+        # Collision detection with player
+        # If true, begin a countdown from 20-0 seconds
+        # During this countdown any score earned is x2
         powerup_score_dif = PVector.sub(pos, powerup_scoremultiply_loc)
         if powerup_score_dif.mag() < player_size/2 + powerup_size/2:
             countdown = True
             powerup_scoremultiply_reset()
             print(powerup_scoremultiply_time)
-
+        
+        # Displays duration of x2 score bonus
         if countdown is True:
             fill(255)
             textSize(30)
             textAlign(BOTTOM, CENTER)
             text("x2 Score Time :" + str(powerup_scoremultiply_time),
                  width/2 - 120, height - 45)
+            # Every 60 frames (per second) reduce the time by
+            # Once the countdown reaches 0 turn the countdown to false
+            # This stops the counting down
+            # The variable powerup_scoremultiply_time is 20 seconds
             if frames % 60 == 0:
                 powerup_scoremultiply_time -= 1
                 if powerup_scoremultiply_time == 0:
@@ -550,6 +574,7 @@ def draw():
             fill(255)
             ellipse(boss.x, boss.y, boss_size, boss_size)
 
+            # If the boss is not dead, display it's health
             if boss_dead == False:
                 fill(255)
                 textSize(24)
@@ -561,6 +586,9 @@ def draw():
             if boss.x <= width - 100:
                 boss_speed.x = 0
 
+
+            # The creation of the movement of the boss' attack
+            # It is aimed at the player's location
             if attacked is False:
                 boss_dif = PVector.sub(boss_attack, pos)
                 push = PVector.fromAngle(boss_dif.heading())
@@ -569,10 +597,14 @@ def draw():
                 boss_attackspeed.add(push)
                 attacked = True
 
+            # Creation of the boss' attack
             ellipse(boss_attack.x, boss_attack.y, 20, 20)
             boss_attack.sub(boss_attackspeed)
             boss_hitplayer = PVector.sub(boss_attack, pos)
 
+            # If the boss attack hits the player
+            # Reduce lives by 1 and add 1 to the number of lives lost
+            # Resets the boss' attack location (It's an ellipse)
             if boss_hitplayer.mag() < player_size/2:
                 lives -= 1
                 lives_lost += 1
@@ -580,36 +612,46 @@ def draw():
                 boss_attack.y = height/2
                 attacked = False
 
+            # If the boss' attack goes off the screen
+            # Reset the boss' attack
             if boss_attack.x < 0:
                 boss_attack.x = boss.x
                 boss_attack.y = height/2
                 attacked = False
 
+            # Collision detection of lasers and boss
+            # If a laser hits, reduce the boss hp by 5 (laser damage)
             for lasers in laser_list:
                 centre_bosslaser = PVector(lasers.x + 13, lasers.y + 5)
                 boss_dif = PVector.sub(centre_bosslaser, boss)
                 if boss_dif.mag() < boss_size/2:
                     laser_list.remove(lasers)
-                    boss_hp -= 5
+                    boss_hp -= laser_damage
                     break
             
+            # If the boss is dead give a 500 point score bonus
+            # Stop attacking
             if boss_hp == 0:
                 boss_dead = True
                 score += 500
                 attacked = True
                 boss_hp -= 1
             
+            # Moves the boss off the screen 
             if boss_dead == True:
                 boss.y += 2
                 key_space = False
                 boss_attackspeed = PVector(0, 0)
                 boss_attack = PVector(width + 100, height + 100) 
                 
+            # Moves the boss off the screen
             if boss.y >= height + boss_size/2:
                 bossleftscreen = time
                 boss_dead = False
                 boss.y = -100
                 
+           # If it's been 2 seconds since the boss left the screen
+           # Change the level to the second level 
             if time - bossleftscreen >= 2000 and bossleftscreen != 0:
                 screen = "level_2_loadingscreen"
                 
