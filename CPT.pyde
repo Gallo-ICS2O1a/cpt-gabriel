@@ -353,17 +353,17 @@ def draw():
         #Creates the fadeaway effect for the "Level 1" text
         #Every 5 frames, reduces the opacity of the text by 255/20,
         #Increase the fade_colour variable by 255/20, causing the background colour to change until it reaches 255 (black)
-        if frames % 5 == 0:
-            opacity -= 255 / 20
-            fade_colour += 255 / 20
+        frames % 5 == 0
+        opacity -= 255 / 40
+        fade_colour += 255 / 40
             
             #If the fade_colour variable's value is greater than 255 (black colour), set it to black (255) and change the screen to the first level
             #When the screen becomes black, it means the fadeaway effect is done, thus the variables used are reset to be used again
-            if fade_colour > 255:
-                fade_colour = 255
-                opacity = 255
-                fade_colour = 0
-                screen = "level1"
+        if fade_colour > 255:
+            fade_colour = 255
+            opacity = 255
+            fade_colour = 0
+            screen = "level1"
     
     #Checks if the screen variable is equal to level1,
     #If it is, do the following things
@@ -589,7 +589,9 @@ def draw():
                 boss_attackspeed = PVector(0, 0)
                 boss_attack = PVector(width + 100, height + 100)
                 attacked = True
-                
+        
+        frames += 1        
+                                
         if lives == 0:
             screen = "gameover1"
 
@@ -683,7 +685,7 @@ def draw():
             if loading_time == 0:
                 screen = "level3"
 
-    frames += 1
+    
 
 
 def mousePressed():
