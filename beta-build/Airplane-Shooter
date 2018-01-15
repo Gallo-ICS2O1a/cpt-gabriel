@@ -631,3 +631,56 @@ def draw():
 
         if pos.y + player_size / 2 >= height:
             pos.y = height - player_size / 2
+            
+    frames += 1 
+  
+def mousePressed():
+    global click
+    if mouseButton == LEFT:
+        click = True
+
+
+def mouseReleased():
+    global click
+    if mouseButton == LEFT:
+        click = False
+
+
+def keyPressed():
+    global key_up
+    global key_down
+    global key_space
+    global laser_list
+    global last_shot
+    if key == CODED:
+        if keyCode == UP:
+            key_up = True
+        elif keyCode == DOWN:
+            key_down = True
+
+    if key == " ":
+        key_space = True
+
+        if screen == "gameover1":
+            retry_level1()
+        if screen == "gameover2":
+            retry_level2()
+        if screen == "gameover3":
+            retry_level3()
+
+
+def keyReleased():
+    global key_up
+    global key_down
+    global key_space
+    if key == CODED:
+        if keyCode == UP:
+            key_up = False
+
+    if key == CODED:
+        if keyCode == DOWN:
+            key_down = False
+
+    if key == " ":
+        key_space = False
+
