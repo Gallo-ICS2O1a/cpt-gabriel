@@ -57,6 +57,20 @@ powerup_scoremultiply = 2
 powerup_scoremultiply_time = 20
 powerup_scoremultiply_spawn = False
 countdown = False
+randomSpawn = random(frames + 300, 1000)
+warningcolour = 255
+tempx = 0
+temp = None
+sx = 800 + 100
+sy = 0 + 50
+angle = 0
+
+def giantLaser():
+    num = random(1)
+   # return num >= 0.5
+    return True
+
+
 
 def retry_level1():
     
@@ -134,12 +148,15 @@ def setup():
     global main_menu_background
     global powerup_scorepic
     global powerup_heartpic
+    global temp
     size(800, 600)
     background1 = loadImage("background3.jpg")
     background2 = loadImage("background4.jpg")
     main_menu_background = loadImage("background.jpg")
     powerup_scorepic = loadImage("powerup_score.gif")
     powerup_heartpic = loadImage("powerup_heart.gif")
+    temp = giantLaser()
+    
 
 def draw():
     global screen
@@ -198,7 +215,15 @@ def draw():
     global countdown
     global powerup_scorepic
     global powerup_heartpic
-    
+    global randomSpawn
+    global warningcolour
+    global tempx
+    global temp
+    global sx
+    global sy
+    global angle
+
+
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
         
@@ -369,6 +394,7 @@ def draw():
     #If it is, do the following things
     if screen == "level1":
        
+
         time = millis() 
         #Creates the moving background (scrolling background)
         x_level1_background = constrain(x_level1_background, 0, background1.width - width)
@@ -440,7 +466,7 @@ def draw():
         # They have their own independent speed
         # Go from right to left (spawns on the right side of the screen)
         for enemy in enemy_list:
-            fill(0)
+            fill(255)
             ellipse(enemy.x, enemy.y, enemy_size, enemy_size)
             enemy.x -= enemy_speed.x
 
@@ -481,6 +507,42 @@ def draw():
                         score += enemy_kill_score
                     break
 
+        if temp:
+            if frames == floor(randomSpawn):
+                tempx = time
+            
+                        
+        if tempx > 0:
+            textAlign(CENTER,CENTER)
+            textSize(108)
+            fill(warningcolour)
+            text("WARNING!",width/2 + 20, height/2)
+            if frames % 60 == 0:
+                if warningcolour == 255:
+                    warningcolour = 0
+                else:
+                    warningcolour = 255
+                    
+        if time >= tempx + 4000 and frames > floor(randomSpawn):
+            tempx = 0
+            temp = False
+            pushMatrix()
+            rectMode(CENTER)
+            translate(sx,sy)
+            fill(0,255,0)
+            rotate(radians(angle))
+            rect(0,0,50,50)
+            print(angle)
+            print(sx)
+            print(sy)
+            sx -= 3
+            if sx <= width/2:
+                sx = width/2
+            popMatrix()
+            
+                
+
+    
         fill(255, 0, 0)
         if frames >= powerup_heart_trigger:
             image(powerup_heartpic,powerup_heart.x,powerup_heart.y)
@@ -591,7 +653,8 @@ def draw():
                 attacked = True
         
         frames += 1        
-                                
+        angle += 5
+                                                     
         if lives == 0:
             screen = "gameover1"
 
