@@ -10,6 +10,7 @@ background3 = 0
 main_menu_background = loadImage("background.jpg")
 powerup_scorepic = loadImage("powerup_score.gif")
 powerup_heartpic = loadImage("powerup_heart.gif")
+giantLaserpic = loadImage("giant_laser.gif")
 level_1_loadingscreen = False
 level_2_loadingscreen = False
 level_3_loadingscreen = False
@@ -61,10 +62,14 @@ randomSpawn = random(frames + 300, 1000)
 warningcolour = 255
 tempx = 0
 temp = None
-sx = 800 + 100
+sx = 800 +  100
 sy = 0 + 50
 angle = 0
-
+img_loc = - 800
+temps = 5
+centre_giantL = PVector(0,0)
+giantLaserSpawn = False
+done_moving = 0
 def giantLaser():
     num = random(1)
    # return num >= 0.5
@@ -148,6 +153,7 @@ def setup():
     global main_menu_background
     global powerup_scorepic
     global powerup_heartpic
+    global giantLaserpic
     global temp
     size(800, 600)
     background1 = loadImage("background3.jpg")
@@ -155,6 +161,7 @@ def setup():
     main_menu_background = loadImage("background.jpg")
     powerup_scorepic = loadImage("powerup_score.gif")
     powerup_heartpic = loadImage("powerup_heart.gif")
+    giantLaserpic = loadImage("giant_laser.gif")
     temp = giantLaser()
     
 
@@ -222,8 +229,12 @@ def draw():
     global sx
     global sy
     global angle
-
-
+    global giantLaserpic
+    global img_loc
+    global temps
+    global centre_giantL
+    global giantLaserSpawn
+    global done_moving 
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
         
@@ -394,7 +405,7 @@ def draw():
     #If it is, do the following things
     if screen == "level1":
        
-
+        
         time = millis() 
         #Creates the moving background (scrolling background)
         x_level1_background = constrain(x_level1_background, 0, background1.width - width)
@@ -403,6 +414,10 @@ def draw():
         x_level1_background = frames
         powerup_scorepic.resize(powerup_size,powerup_size)
         powerup_heartpic.resize(powerup_size,powerup_size)
+        #print(giantLaserpic.width,giantLaserpic.height)
+        giantLaserpic.resize(850,150)
+        
+        
         
         #Score and lives text on the bottom of the screen
         fill(255)
@@ -526,22 +541,53 @@ def draw():
         if time >= tempx + 4000 and frames > floor(randomSpawn):
             tempx = 0
             temp = False
+            ##rectMode(CENTER)
+            #translate(sx,sy)
+            #fill(0,255,0)
+            #rotate(radians(angle))
+            #rect(0,0,50,50)
+            #print(angle)
+            #print(sx)
+            #print(sy)
+            #sx -= 3
+            #if sx <= width/2:
+                #sx = width/2
             pushMatrix()
-            rectMode(CENTER)
-            translate(sx,sy)
-            fill(0,255,0)
-            rotate(radians(angle))
-            rect(0,0,50,50)
-            print(angle)
-            print(sx)
-            print(sy)
-            sx -= 3
-            if sx <= width/2:
-                sx = width/2
+            imageMode(CENTER)
+            translate(width/2,0)
+            rotate(radians(90))
+            image(giantLaserpic,img_loc,0)
+            
+            
+            if img_loc >= 0 + giantLaserpic.width/2 - 200:
+                temps = 0
+                centre_giantL = PVector(width/2,img_loc)
+                done_moving = time
+                giantLaserSpawn = True
+                randomSpawn = 0
+                print(done_moving)
+            
+    
+            img_loc += temps   
             popMatrix()
             
+            if giantLaserSpawn:
+                for enemy in enemy_list:
+                    if enemy.x <= width/2 + 75 and enemy.x >= width/2 - 75:
+                        enemy_list.remove(enemy)
+                        break
+                if done_moving > 0:
+                    if time >= done_moving + 5000:
+                        giantLaserSpawn = False
+                        img_loc = 0
+            
+                    
                 
 
+    
+    
+    
+    
     
         fill(255, 0, 0)
         if frames >= powerup_heart_trigger:
