@@ -1,11 +1,11 @@
-screen = "menu"
+screen = "level_2_loadingscreen"
 frames = 0
 x_level1_background = 0
 y_level1_background = 0
 x_level2_background = 0
 y_level2_background = 0
 background1 = loadImage("background3.jpg")
-background2 = loadImage("background4.jpg")
+background2 = loadImage("background2.jpg")
 background3 = 0
 main_menu_background = loadImage("background.jpg")
 powerup_scorepic = loadImage("powerup_score.gif")
@@ -70,6 +70,21 @@ temps = 5
 centre_giantL = PVector(0,0)
 giantLaserSpawn = False
 done_moving = 0
+
+
+
+def bossDead():
+    global score
+    global boss_attackspeed
+    global attacked
+    global boss_attack
+    
+    score += 500
+    boss_attackspeed = PVector(0, 0)
+    boss_attack = PVector(width + 100, height + 100)
+    attacked = True
+
+
 def giantLaser():
     num = random(1)
    # return num >= 0.5
@@ -157,7 +172,7 @@ def setup():
     global temp
     size(800, 600)
     background1 = loadImage("background3.jpg")
-    background2 = loadImage("background4.jpg")
+    background2 = loadImage("background2.jpg")
     main_menu_background = loadImage("background.jpg")
     powerup_scorepic = loadImage("powerup_score.gif")
     powerup_heartpic = loadImage("powerup_heart.gif")
@@ -389,7 +404,7 @@ def draw():
         #Creates the fadeaway effect for the "Level 1" text
         #Every 5 frames, reduces the opacity of the text by 255/20,
         #Increase the fade_colour variable by 255/20, causing the background colour to change until it reaches 255 (black)
-        frames % 5 == 0
+
         opacity -= 255 / 40
         fade_colour += 255 / 40
             
@@ -455,7 +470,7 @@ def draw():
             lasers.x += laser_speed
             
             #If the lasers reach the end of the screen, removes the laser location from the list
-            if lasers.x > width:
+            if lasers.x > width + 13:
                 laser_list.remove(lasers)
                 
             
@@ -487,7 +502,7 @@ def draw():
 
             # If the enemies go past the left side of the screen,
             # remove them from the enemy list
-            if enemy.x < 0:
+            if enemy.x < 0 - enemy_size:
                 enemy_list.remove(enemy)
 
             # Collision Detection
@@ -497,7 +512,7 @@ def draw():
             dif_playerhit = PVector.sub(enemy, pos)
             if dif_playerhit.mag() < player_size/2 + enemy_size/2:
                 enemy_list.remove(enemy)
-                lives -= 1
+                #lives -= 1
                 lives_lost += 1
 
             # Loops through the laser_list
@@ -541,17 +556,7 @@ def draw():
         if time >= tempx + 4000 and frames > floor(randomSpawn):
             tempx = 0
             temp = False
-            ##rectMode(CENTER)
-            #translate(sx,sy)
-            #fill(0,255,0)
-            #rotate(radians(angle))
-            #rect(0,0,50,50)
-            #print(angle)
-            #print(sx)
-            #print(sy)
-            #sx -= 3
-            #if sx <= width/2:
-                #sx = width/2
+
             pushMatrix()
             imageMode(CENTER)
             translate(width/2,0)
@@ -561,27 +566,22 @@ def draw():
             
             if img_loc >= 0 + giantLaserpic.width/2 - 200:
                 temps = 0
-                centre_giantL = PVector(width/2,img_loc)
-                done_moving = time
+                if done_moving == 0:
+                    done_moving = time
                 giantLaserSpawn = True
-                randomSpawn = 0
-                print(done_moving)
-            
-    
+                if time >= done_moving + 3000:
+                    giantLaserSpawn = False
+                    img_loc = 0 - giantLaserpic.width/2 - 200
+
+
             img_loc += temps   
             popMatrix()
-            
+
             if giantLaserSpawn:
                 for enemy in enemy_list:
                     if enemy.x <= width/2 + 75 and enemy.x >= width/2 - 75:
                         enemy_list.remove(enemy)
                         break
-                if done_moving > 0:
-                    if time >= done_moving + 5000:
-                        giantLaserSpawn = False
-                        img_loc = 0
-            
-                    
                 
 
     
@@ -649,11 +649,14 @@ def draw():
             fill(255)
             ellipse(boss.x, boss.y, boss_size, boss_size)
 
-            fill(255)
-            textSize(24)
-            text("Boss HP: " + str(boss_hp), boss.x - boss_size/2 - 13,
-                 boss.y + boss_size/2 + 25)
 
+            if boss_hp > 0:
+                
+                fill(255)
+                textSize(24)
+                text("Boss HP: " + str(boss_hp), boss.x - boss_size/2 - 13,
+                    boss.y + boss_size/2 + 25)
+    
             # Boss Speed
             boss.x -= boss_speed.x
             if boss.x <= width - 100:
@@ -688,15 +691,19 @@ def draw():
                 boss_dif = PVector.sub(centre_bosslaser, boss)
                 if boss_dif.mag() < boss_size/2:
                     laser_list.remove(lasers)
-                    boss_hp -= 5
+                    boss_hp -= laser_damage
                     break
             
-            if boss_hp <= 0:
-                score += 500
+            if boss_hp == 0:
+                bossDead()
+                boss_hp = -1
+                
+            if boss_hp == -1:
                 boss.y += 2
-                boss_attackspeed = PVector(0, 0)
-                boss_attack = PVector(width + 100, height + 100)
-                attacked = True
+                laser_damage = 0
+                if boss.y >= height + boss_size/2:
+                    screen = "level_2_loadingscreen"
+        
         
         frames += 1        
         angle += 5
@@ -727,29 +734,32 @@ def draw():
         textSize(58)
         textAlign(CENTER)
         text("LEVEL 2", width / 2, height / 2)
-        if frames % 5 == 0:
-            loading_time -= 0.001
-            opacity -= 255 / 20
-            fade_colour += 255 / 20
-            if fade_colour > 255:
-                fade_colour = 255
-                loading_time = 6
-                opacity = 255
-                screen = "level2"
-            if loading_time == 0:
-                screen = "level2"
-                fade_colour = 255
-                loading_time = 6
-                opacity = 6
+
+        opacity -= 255 / 40
+        fade_colour += 255 / 40
+        if fade_colour > 255:
+            fade_colour = 255
+            loading_time = 6
+            opacity = 255
+            screen = "level2"
+        if loading_time == 0:
+            screen = "level2"
+            fade_colour = 255
+            loading_time = 6
+            opacity = 6
 
     if screen == "level2":
-
+        
+        
+        time = millis()
         x_level2_background = constrain(x_level2_background, 0,
                                         background2.width - width)
         y_level2_background = constrain(y_level2_background, 0,
                                         background2.height - height)
         set(-x_level2_background, 0, background2)
         x_level2_background = frames
+        
+        
         fill(255)
         textSize(30)
         textAlign(BOTTOM, RIGHT)
@@ -763,6 +773,12 @@ def draw():
 
         if key_down is True:
             pos.y += y_speed
+            
+        if key_space == True:
+            if time >= last_shot + 500:
+                laser_list.append(PVector(pos.x + player_size / 2, pos.y))
+                last_shot = time
+                key_space = False
 
         for lasers in laser_list:
             fill(0, 255, 0)
@@ -777,6 +793,9 @@ def draw():
         if pos.y + player_size / 2 >= height:
             pos.y = height - player_size / 2
 
+        frames += 1
+        
+        
     if screen == "level_3_loadingscreen":
 
         background(fade_colour, opacity)
