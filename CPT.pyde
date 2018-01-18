@@ -1,4 +1,4 @@
-screen = "level_2_loadingscreen"
+screen = "menu"
 frames = 0
 x_level1_background = 0
 y_level1_background = 0
