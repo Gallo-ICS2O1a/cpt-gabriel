@@ -20,6 +20,7 @@ fade_colour = 0
 lives = 5
 lives_lost = 0
 score = 0
+total_score = 0
 y_speed = 5
 laser_speed = 10
 laser_damage = 5
@@ -62,9 +63,6 @@ randomSpawn = random(frames + 300, 1000)
 warningcolour = 255
 tempx = 0
 temp = None
-sx = 800 +  100
-sy = 0 + 50
-angle = 0
 img_loc = - 800
 temps = 5
 centre_giantL = PVector(0,0)
@@ -72,14 +70,15 @@ giantLaserSpawn = False
 done_moving = 0
 
 
-
 def bossDead():
     global score
+    global total_score
     global boss_attackspeed
     global attacked
     global boss_attack
     
     score += 500
+    total_score += score
     boss_attackspeed = PVector(0, 0)
     boss_attack = PVector(width + 100, height + 100)
     attacked = True
@@ -87,8 +86,10 @@ def bossDead():
 
 def giantLaser():
     num = random(1)
-   # return num >= 0.5
-    return True
+    print(num)
+    print(num >= 0.8)
+    return num >= 0.8
+
 
 
 
@@ -110,6 +111,7 @@ def retry_level1():
     global boss
     global boss_attack
     global boss_attackspeed
+    global boss_speed
     
     background1 = loadImage("background3.jpg")
     pos = PVector(0 + player_size / 2, 300)
@@ -125,6 +127,7 @@ def retry_level1():
     boss = PVector(800 + 100, 600/2)
     boss_attack = PVector(boss.x - boss_size/2,boss.y)
     boss_attackspeed = PVector(0,0)
+    boss_speed.x = 2
     attacked = False
     
     
@@ -188,6 +191,7 @@ def draw():
     global lives
     global lives_lost
     global score
+    global total_score
     global y_speed
     global frames
     global pos
@@ -241,15 +245,13 @@ def draw():
     global warningcolour
     global tempx
     global temp
-    global sx
-    global sy
-    global angle
     global giantLaserpic
     global img_loc
     global temps
     global centre_giantL
     global giantLaserSpawn
     global done_moving 
+
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
         
@@ -429,11 +431,9 @@ def draw():
         x_level1_background = frames
         powerup_scorepic.resize(powerup_size,powerup_size)
         powerup_heartpic.resize(powerup_size,powerup_size)
-        #print(giantLaserpic.width,giantLaserpic.height)
         giantLaserpic.resize(850,150)
         
-        
-        
+
         #Score and lives text on the bottom of the screen
         fill(255)
         textSize(30)
@@ -476,7 +476,8 @@ def draw():
             
         #If the enemy_spawn variable is set to false, create enemies and add their randomized spawn location to the list of enemies        
         if enemy_spawn == False:
-            enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), random(0 + enemy_size/2, height - enemy_size/2)))
+            enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), 
+                                      random(0 + enemy_size/2, height - enemy_size/2)))
             
         # Checks the length of the enemy_list
         # If it's greater than 10 stop the spawning of enemies,
@@ -623,7 +624,6 @@ def draw():
         if powerup_score_dif.mag() < player_size/2 + powerup_size/2:
             countdown = True
             powerup_scoremultiply_reset()
-            print(powerup_scoremultiply_time)
 
         if countdown is True:
             fill(255)
@@ -665,7 +665,7 @@ def draw():
             if attacked is False:
                 boss_dif = PVector.sub(boss_attack, pos)
                 push = PVector.fromAngle(boss_dif.heading())
-                push.mult(random(5, 8))
+                push.mult(random(8, 10))
                 boss_attackspeed = PVector(0, 0)
                 boss_attackspeed.add(push)
                 attacked = True
@@ -704,9 +704,8 @@ def draw():
                 if boss.y >= height + boss_size/2:
                     screen = "level_2_loadingscreen"
         
-        
+
         frames += 1        
-        angle += 5
                                                      
         if lives == 0:
             screen = "gameover1"
@@ -727,6 +726,9 @@ def draw():
         if pos.y + player_size / 2 >= height:
             pos.y = height - player_size / 2
 
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     if screen == "level_2_loadingscreen":
 
         background(fade_colour, opacity)
@@ -734,22 +736,19 @@ def draw():
         textSize(58)
         textAlign(CENTER)
         text("LEVEL 2", width / 2, height / 2)
-
+        
         opacity -= 255 / 40
         fade_colour += 255 / 40
         if fade_colour > 255:
             fade_colour = 255
             loading_time = 6
             opacity = 255
+            frames = 0
+            score = 0
+            lives = 5
             screen = "level2"
-        if loading_time == 0:
-            screen = "level2"
-            fade_colour = 255
-            loading_time = 6
-            opacity = 6
 
     if screen == "level2":
-        
         
         time = millis()
         x_level2_background = constrain(x_level2_background, 0,
@@ -764,6 +763,7 @@ def draw():
         textSize(30)
         textAlign(BOTTOM, RIGHT)
         text("Lives: " + str(lives), width - 130, height - 30)
+        text("Score: " + str(score), width - 770, height - 30)
 
         fill(255, 0, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
@@ -787,6 +787,24 @@ def draw():
             if lasers.x > width:
                 laser_list.remove(lasers)
 
+
+        if enemy_spawn == False:
+            enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), 
+                                      random(0 + enemy_size/2, height - enemy_size/2)))
+            
+        if len(enemy_list) > 10:
+            enemy_spawn = True
+
+        if frames % 40 == 0:
+            enemy_spawn = False
+            
+        for enemy in enemy_list:
+            fill(255)
+            ellipse(enemy.x, enemy.y, enemy_size, enemy_size)
+            enemy.x -= enemy_speed.x
+            if enemy.x < 0 - enemy_size:
+                enemy_list.remove(enemy)
+
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
 
@@ -809,8 +827,6 @@ def draw():
             fade_colour += 255 / 20
             if fade_colour > 255:
                 fade_colour = 255
-                screen = "level3"
-            if loading_time == 0:
                 screen = "level3"
 
     
