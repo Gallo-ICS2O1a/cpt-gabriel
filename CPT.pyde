@@ -1,13 +1,15 @@
-screen = "menu"
+screen = "level_1_loadingscreen"
 frames = 0
 x_level1_background = 0
 y_level1_background = 0
 x_level2_background = 0
 y_level2_background = 0
-background1 = loadImage("background3.jpg")
-background2 = loadImage("background2.jpg")
-background3 = 0
+x_level3_background = 0
+y_level3_background = 0
 main_menu_background = loadImage("background.jpg")
+background1 = loadImage("background1.jpg")
+background2 = loadImage("background2.jpg")
+background3 = loadImage("background3.jpg")
 powerup_scorepic = loadImage("powerup_score.gif")
 powerup_heartpic = loadImage("powerup_heart.gif")
 giantLaserpic = loadImage("giant_laser.gif")
@@ -31,9 +33,9 @@ enemy_speed = PVector(3,0)
 enemy_kill_score = 50
 boss_hp = 100
 boss_size = 100
-boss = PVector(800 + 100, 600/2)
+boss_loc = PVector(800 + 100, 600/2)
 boss_speed = PVector(2,0)
-boss_attack = PVector(boss.x - boss_size/2,boss.y)
+boss_attack = PVector(boss_loc.x - boss_size/2,boss_loc.y)
 boss_attackspeed = PVector(0,0)
 attacked = False
 enemy_list = []
@@ -48,7 +50,7 @@ hover_colour1 = [175, 238, 238]
 hover_colour2 = [175, 238, 238]
 hover_colour3 = [175, 238, 238]
 hover_colour4 = [175, 238, 238]
-powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
+powerup_heart_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
 powerup_speed = PVector(random(2,4),0)
 powerup_heart_spawn = False
 powerup_heart_trigger = random(frames + 500, frames + 2000)
@@ -63,19 +65,27 @@ randomSpawn = random(frames + 300, 1000)
 warningcolour = 255
 tempx = 0
 temp = None
-img_loc = - 800
+img_loc = -800
 temps = 5
-centre_giantL = PVector(0,0)
 giantLaserSpawn = False
 done_moving = 0
 
+def gameover():
+    background(255)
+    textSize(48)
+    fill(0)
+    textAlign(CENTER, CENTER)
+    text("GAME OVER!", width/2, height/2)
+    textSize(30)
+    fill(0, 255, 0)
+    text("Press Space To Play Again", width/2, height/2 + 50)
 
 def bossDead():
     global score
     global total_score
     global boss_attackspeed
-    global attacked
     global boss_attack
+    global attacked
     
     score += 500
     total_score += score
@@ -86,85 +96,114 @@ def bossDead():
 
 def giantLaser():
     num = random(1)
-    print(num)
-    print(num >= 0.8)
     return num >= 0.8
 
 
+def retry_level():
 
-
-def retry_level1():
-    
-    #Retry function to reset level 1
+    # Retry function to reset the level 
     global pos
     global frames
     global laser_list
-    global lives
-    global x_level1_background
-    global y_level1_background
     global enemy_list
+    global lives, lives_lost
+    global x_level1_background, y_level1_background, background1
+    global x_level2_background, y_level2_background, background2
+    global x_level3_background, y_level3_background, background3
     global screen
     global score
-    global background1
-    global lives_lost
     global last_shot
-    global boss
-    global boss_attack
-    global boss_attackspeed
-    global boss_speed
+    global boss_loc, boss_attack, boss_attackspeed, boss_speed, attacked
+    global countdown
+    global powerup_heart_loc, powerup_speed, powerup_heart_loc_spawn, powerup_heart_trigger 
+    global powerup_scoremultiply_loc, powerup_scoremultiply_trigger, powerup_scoremultiply_time, powerup_scoremultiply_spawn 
+    global randomSpawn, warningcolour, tempx, temp, img_loc, temps, giantLaserSpawn, done_moving
     
-    background1 = loadImage("background3.jpg")
     pos = PVector(0 + player_size / 2, 300)
     laser_list = []
     lives = 5
-    lives_lost -= 3
-    x_level1_background = 0
-    y_level1_background = 0
     frames = 0
     enemy_list = []
     score = 0
-    screen = "level_1_loadingscreen"
-    boss = PVector(800 + 100, 600/2)
-    boss_attack = PVector(boss.x - boss_size/2,boss.y)
+    powerup_heart_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
+    powerup_speed = PVector(random(2,4),0)
+    powerup_heart_loc_spawn = False
+    powerup_heart_trigger = random(frames + 500, frames + 2000)
+    powerup_scoremultiply_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
+    powerup_scoremultiply_trigger = random(frames + 200, frames + 3000)
+    powerup_scoremultiply_time = 20
+    powerup_scoremultiply_spawn = False
+    countdown = False
+    boss_loc = PVector(800 + 100, 600/2)
+    boss_attack = PVector(boss_loc.x - boss_size/2,boss_loc.y)
     boss_attackspeed = PVector(0,0)
-    boss_speed.x = 2
+    boss_speed = PVector(2,0)
     attacked = False
+    randomSpawn = random(frames + 300, 1000)
+    warningcolour = 255
+    tempx = 0
+    temp = None
+    img_loc = -800
+    temps = 5
+    giantLaserSpawn = False
+    done_moving = 0
     
+    if screen == 'gameover1':
+        background1 = loadImage("background1.jpg")
+        x_level1_background = 0
+        y_level1_background = 0
+        screen = "level_1_loadingscreen"
     
-#def retry_level2():
+    if screen == 'gameover2':
+        background2 = loadImage("background2.jpg")
+        x_level2_background = 0
+        y_level2_background = 0
+        screen = 'level_2_loadingscreen'
+        
+    if screen == 'gameover3':
+        background3 = loadImage("background3.jpg")
+        x_level3_background = 0
+        y_level3_background = 0
+        screen = 'level_3_loadingscreen'
     
-#def retry_level3():
-    
+
+
+
 def powerup_scoremultiply_reset():
-    
+
+    # Function to reset the powerup_scoremultiplier
+
     global frames
     global powerup_scoremultiply_spawn
     global powerup_speed
     global powerup_scoremultiply_loc
     global powerup_scoremultiply_trigger
-    
+
     powerup_speed = PVector(random(2,4),0)
     powerup_scoremultiply_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
     powerup_scoremultiply_trigger = powerup_scoremultiply_trigger = random(frames + 200, frames + 3000)
     powerup_scoremultiply_spawn = False
-    
+
 def powerup_heart_reset():
-    
+
+    # Function to reset the powerup_heart
+
     global frames
     global powerup_heart_spawn
     global powerup_speed
-    global powerup_heart
+    global powerup_heart_loc
     global powerup_heart_trigger
-    
+
     powerup_heart_spawn = False
-    powerup_heart = PVector(random(800 + 100, 800 + 200),random(0, 600))
+    powerup_heart_loc = PVector(random(800 + 100, 800 + 200),random(0, 600))
     powerup_speed = PVector(random(2,4),0)
     powerup_heart_trigger = random(frames + 500, frames + 2000)
 
 def setup():
-    
-    #Loads the images (backgrounds) once
-    #Sets the size of the window in which the game is played in to 800 x 600
+
+    # Loads the backgrounds and images
+    # Sets the size of the window in which the game is played in, to 800 x 600
+    # Sets the temp variable to the returned boolean of the giantLaser function
     global background1
     global background2
     global background3
@@ -174,83 +213,39 @@ def setup():
     global giantLaserpic
     global temp
     size(800, 600)
-    background1 = loadImage("background3.jpg")
+    background1 = loadImage("background1.jpg")
     background2 = loadImage("background2.jpg")
+    background3 = loadImage("background3.jpg")
     main_menu_background = loadImage("background.jpg")
     powerup_scorepic = loadImage("powerup_score.gif")
     powerup_heartpic = loadImage("powerup_heart.gif")
     giantLaserpic = loadImage("giant_laser.gif")
     temp = giantLaser()
-    
+
 
 def draw():
     global screen
+    global frames
     global loading_time
     global opacity
     global fade_colour
-    global lives
-    global lives_lost
-    global score
-    global total_score
-    global y_speed
-    global frames
-    global pos
-    global laser_list
-    global key_up
-    global key_down
-    global key_space
-    global laser_speed
-    global laser_damage
-    global last_shot
-    global hover_colour1
-    global hover_colour2
-    global hover_colour3
-    global hover_colour4
+    global lives, lives_lost
+    global score, total_score
+    global pos, y_speed
+    global laser_list, laser_speed, laser_damage, last_shot
+    global key_up, key_down, key_space
+    global hover_colour1, hover_colour2, hover_colour3, hover_colour4
     global click
-    global enemy_kill_score
-    global enemy_size
-    global enemy_speed
-    global enemy_list
-    global enemy_spawn
-    global boss_hp
-    global boss_size
-    global boss
-    global boss_speed
-    global boss_attack
-    global boss_attackspeed
-    global x_level1_background
-    global y_level1_background
-    global x_level2_background
-    global y_level2_background
-    global background1
-    global background2
-    global background3
+    global enemy_list, enemy_kill_score, enemy_size, enemy_speed, enemy_spawn
     global main_menu_background
-    global enemy_spawntime
-    global attacked
-    global powerup_heart
-    global powerup_speed
-    global powerup_heart_spawn
-    global powerup_heart_trigger
-    global powerup_size
-    global powerup_scoremultiply
-    global powerup_scoremultiply_trigger
-    global powerup_scoremultiply_time
-    global powerup_scoremultiply_loc
-    global powerup_scoremultiply_spawn
-    global countdown
-    global powerup_scorepic
-    global powerup_heartpic
-    global randomSpawn
-    global warningcolour
-    global tempx
-    global temp
-    global giantLaserpic
-    global img_loc
-    global temps
-    global centre_giantL
-    global giantLaserSpawn
-    global done_moving 
+    global boss_loc, boss_hp, boss_size, boss_speed, boss_attack, boss_attackspeed, attacked
+    global background1, x_level1_background, y_level1_background
+    global background2, x_level2_background, y_level2_background
+    global background3, x_level3_background, y_level3_background
+    global powerup_size, powerup_speed
+    global powerup_heart_loc, powerup_heart_spawn, powerup_heart_trigger, powerup_heartpic
+    global powerup_scoremultiply_loc, powerup_scoremultiply, powerup_scoremultiply_trigger, powerup_scoremultiply_time, powerup_scoremultiply_spawn, countdown, powerup_scorepic
+    global randomSpawn, warningcolour, tempx, temp, giantLaserpic, img_loc, temps, giantLaserSpawn, done_moving
 
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
@@ -291,7 +286,8 @@ def draw():
         diff_howto_rect = PVector(mouseX - center_howto_rect.x, mouseY - center_howto_rect.y)
         diff_quit_sq = PVector(mouseX - center_quit_square.x, mouseY - center_quit_square.y)
         
-        #Conditions for if the mouse is hovering over the rectangles, change their colours to let the player know which option they're hovering over
+        # Conditions for if the mouse is hovering over the rectangles
+        # Change their colours to let the player know which option they're hovering over
         if diff_play_sq.x >= -34 and diff_play_sq.x <= 34 and diff_play_sq.y >= -29 and diff_play_sq.y <= 29:
 
             hover_colour1[0] = 0
@@ -404,7 +400,6 @@ def draw():
         text("LEVEL 1", width / 2, height / 2)
         
         #Creates the fadeaway effect for the "Level 1" text
-        #Every 5 frames, reduces the opacity of the text by 255/20,
         #Increase the fade_colour variable by 255/20, causing the background colour to change until it reaches 255 (black)
 
         opacity -= 255 / 40
@@ -413,7 +408,6 @@ def draw():
             #If the fade_colour variable's value is greater than 255 (black colour), set it to black (255) and change the screen to the first level
             #When the screen becomes black, it means the fadeaway effect is done, thus the variables used are reset to be used again
         if fade_colour > 255:
-            fade_colour = 255
             opacity = 255
             fade_colour = 0
             screen = "level1"
@@ -541,8 +535,8 @@ def draw():
         if temp:
             if frames == floor(randomSpawn):
                 tempx = time
-            
-                        
+
+                
         if tempx > 0:
             textAlign(CENTER,CENTER)
             textSize(108)
@@ -553,7 +547,8 @@ def draw():
                     warningcolour = 0
                 else:
                     warningcolour = 255
-                    
+                              
+        
         if time >= tempx + 4000 and frames > floor(randomSpawn):
             tempx = 0
             temp = False
@@ -583,25 +578,19 @@ def draw():
                     if enemy.x <= width/2 + 75 and enemy.x >= width/2 - 75:
                         enemy_list.remove(enemy)
                         break
-                
 
-    
-    
-    
-    
-    
         fill(255, 0, 0)
         if frames >= powerup_heart_trigger:
-            image(powerup_heartpic,powerup_heart.x,powerup_heart.y)
+            image(powerup_heartpic,powerup_heart_loc.x,powerup_heart_loc.y)
             powerup_heart_spawn = True
 
         if powerup_heart_spawn is True:
-            powerup_heart.sub(powerup_speed)
+            powerup_heart_loc.sub(powerup_speed)
 
-        if powerup_heart.x < 0:
+        if powerup_heart_loc.x < 0:
             powerup_heart_reset()
 
-        powerup_heart_dif = PVector.sub(pos, powerup_heart)
+        powerup_heart_dif = PVector.sub(pos, powerup_heart_loc)
         if powerup_heart_dif.mag() < player_size/2 + powerup_size/2:
             if lives == 5:
                 score += 200
@@ -647,25 +636,25 @@ def draw():
 
             # Creates the Boss
             fill(255)
-            ellipse(boss.x, boss.y, boss_size, boss_size)
+            ellipse(boss_loc.x, boss_loc.y, boss_size, boss_size)
 
 
             if boss_hp > 0:
                 
                 fill(255)
                 textSize(24)
-                text("Boss HP: " + str(boss_hp), boss.x - boss_size/2 - 13,
-                    boss.y + boss_size/2 + 25)
+                text("Boss HP: " + str(boss_hp), boss_loc.x - boss_size/2 - 13,
+                    boss_loc.y + boss_size/2 + 25)
     
             # Boss Speed
-            boss.x -= boss_speed.x
-            if boss.x <= width - 100:
+            boss_loc.x -= boss_speed.x
+            if boss_loc.x <= width - 100:
                 boss_speed.x = 0
 
             if attacked is False:
                 boss_dif = PVector.sub(boss_attack, pos)
                 push = PVector.fromAngle(boss_dif.heading())
-                push.mult(random(8, 10))
+                push.mult(random(4, 6))
                 boss_attackspeed = PVector(0, 0)
                 boss_attackspeed.add(push)
                 attacked = True
@@ -675,33 +664,34 @@ def draw():
             boss_hitplayer = PVector.sub(boss_attack, pos)
 
             if boss_hitplayer.mag() < player_size/2:
-                lives -= 1
+                #lives -= 1
                 lives_lost += 1
-                boss_attack.x = boss.x
+                boss_attack.x = boss_loc.x
                 boss_attack.y = height/2
                 attacked = False
 
             if boss_attack.x < 0:
-                boss_attack.x = boss.x
+                boss_attack.x = boss_loc.x
                 boss_attack.y = height/2
                 attacked = False
 
             for lasers in laser_list:
                 centre_bosslaser = PVector(lasers.x + 13, lasers.y + 5)
-                boss_dif = PVector.sub(centre_bosslaser, boss)
+                boss_dif = PVector.sub(centre_bosslaser, boss_loc)
                 if boss_dif.mag() < boss_size/2:
                     laser_list.remove(lasers)
                     boss_hp -= laser_damage
                     break
+
             
             if boss_hp == 0:
                 bossDead()
                 boss_hp = -1
                 
             if boss_hp == -1:
-                boss.y += 2
+                boss_loc.y += 2
                 laser_damage = 0
-                if boss.y >= height + boss_size/2:
+                if boss_loc.y >= height + boss_size/2:
                     screen = "level_2_loadingscreen"
         
 
@@ -709,16 +699,9 @@ def draw():
                                                      
         if lives == 0:
             screen = "gameover1"
-
-        if screen == "gameover1":
-            background(255)
-            textSize(48)
-            fill(0)
-            textAlign(CENTER, CENTER)
-            text("GAME OVER!", width/2, height/2)
-            textSize(30)
-            fill(0, 255, 0)
-            text("Press Space To Play Again", width/2, height/2 + 50)
+        
+        if screen == 'gameover1':
+            gameover()
 
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
@@ -732,6 +715,7 @@ def draw():
     if screen == "level_2_loadingscreen":
 
         background(fade_colour, opacity)
+        print(screen)
         fill(255, 0, 0, opacity)
         textSize(58)
         textAlign(CENTER)
@@ -740,16 +724,16 @@ def draw():
         opacity -= 255 / 40
         fade_colour += 255 / 40
         if fade_colour > 255:
-            fade_colour = 255
-            loading_time = 6
+            fade_colour = 0
             opacity = 255
+            lives = 5
             frames = 0
             score = 0
-            lives = 5
             screen = "level2"
 
     if screen == "level2":
         
+        print(frames)
         time = millis()
         x_level2_background = constrain(x_level2_background, 0,
                                         background2.width - width)
@@ -758,6 +742,7 @@ def draw():
         set(-x_level2_background, 0, background2)
         x_level2_background = frames
         
+    
         
         fill(255)
         textSize(30)
@@ -768,51 +753,110 @@ def draw():
         fill(255, 0, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
 
-        if key_up is True:
+       #Checks if the up or down arrow keys are pressed and moves the player in the corresponding directon
+        if key_up == True:
             pos.y -= y_speed
 
-        if key_down is True:
+        if key_down == True:
             pos.y += y_speed
             
+        #Creates the lasers
+        #Loops through the laser_list and draws them (according to their location)
+        #They also have their own speed variable so they move from left to right
         if key_space == True:
             if time >= last_shot + 500:
                 laser_list.append(PVector(pos.x + player_size / 2, pos.y))
                 last_shot = time
                 key_space = False
 
+       
         for lasers in laser_list:
             fill(0, 255, 0)
             rect(lasers.x, lasers.y, 26, 10)
             lasers.x += laser_speed
-            if lasers.x > width:
+            
+            #If the lasers reach the end of the screen, removes the laser location from the list
+            if lasers.x > width + 13:
                 laser_list.remove(lasers)
-
-
-        if enemy_spawn == False:
+                
+            
+        #If the enemy_spawn variable is set to false, create enemies and add their randomized spawn location to the list of enemies        
+        if enemy_spawn is False:
             enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), 
                                       random(0 + enemy_size/2, height - enemy_size/2)))
             
+        # Checks the length of the enemy_list
+        # If it's greater than 10 stop the spawning of enemies,
+        # by setting the enemy_spawn variable to true
+        # Every 40 frames, spawn more enemies
+        # by setting the enemy_spawn variable to false
+
         if len(enemy_list) > 10:
             enemy_spawn = True
 
         if frames % 40 == 0:
             enemy_spawn = False
-            
+
+        # Creates the enemies
+        # Loops through the list of enemies
+        # and spawns them based on their location stored in the list
+        # They have their own independent speed
+        # Go from right to left (spawns on the right side of the screen)
         for enemy in enemy_list:
             fill(255)
             ellipse(enemy.x, enemy.y, enemy_size, enemy_size)
             enemy.x -= enemy_speed.x
+
+            # If the enemies go past the left side of the screen,
+            # remove them from the enemy list
             if enemy.x < 0 - enemy_size:
                 enemy_list.remove(enemy)
 
+            # Collision Detection
+            # If an enemy hits the player,
+            # the number of lives will decrease by 1
+            # and the enemy will be removed
+            dif_playerhit = PVector.sub(enemy, pos)
+            if dif_playerhit.mag() < player_size/2 + enemy_size/2:
+                enemy_list.remove(enemy)
+                lives -= 1
+                lives_lost += 1
+
+            # Loops through the laser_list
+            # Finds the centre of the lasers
+            # and the difference between the centre of the laser
+            # and the centre of the enemies
+            for lasers in laser_list:
+                centre_enemylaser = PVector(lasers.x + 13, lasers.y + 5)
+                dif = PVector.sub(centre_enemylaser, enemy)
+
+                # Checks if the laser hits an enemy
+                # If the distance between the laser
+                # and the enemy is less than the radius of the enemy,
+                # Remove the laser, remove the enemy,
+                # and increase the score by 50 points.
+                if dif.mag() < enemy_size/2:
+                    enemy_list.remove(enemy)
+                    laser_list.remove(lasers)
+                    if countdown is True:
+                        score += enemy_kill_score * powerup_scoremultiply
+                    else:
+                        score += enemy_kill_score
+                    break
+                
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
 
         if pos.y + player_size / 2 >= height:
             pos.y = height - player_size / 2
+            
+        if lives == 0:
+            screen = 'gameover2'
+            
+        if screen == 'gameover2':
+            gameover()
 
         frames += 1
-        
         
     if screen == "level_3_loadingscreen":
 
@@ -829,7 +873,7 @@ def draw():
                 fade_colour = 255
                 screen = "level3"
 
-    
+
 
 
 def mousePressed():
@@ -850,6 +894,8 @@ def keyPressed():
     global key_space
     global laser_list
     global last_shot
+    global screen
+    
     if key == CODED:
         if keyCode == UP:
             key_up = True
@@ -858,13 +904,8 @@ def keyPressed():
 
     if key == " ":
         key_space = True
-
-        if screen == "gameover1":
-            retry_level1()
-        if screen == "gameover2":
-            retry_level2()
-        if screen == "gameover3":
-            retry_level3()
+        if "gameover" in screen:
+            retry_level()
 
 
 def keyReleased():
