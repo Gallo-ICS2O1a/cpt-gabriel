@@ -1,4 +1,4 @@
-screen = "level_1_loadingscreen"
+screen = "level2"
 frames = 0
 x_level1_background = 0
 y_level1_background = 0
@@ -61,14 +61,17 @@ powerup_scoremultiply = 2
 powerup_scoremultiply_time = 20
 powerup_scoremultiply_spawn = False
 countdown = False
-randomSpawn = random(frames + 300, 1000)
+giantLasertrigger = random(frames + 600, 1200)
 warningcolour = 255
-tempx = 0
-temp = None
-img_loc = -800
-temps = 5
-giantLaserSpawn = False
+passedLasertrigger = 0
+randomLaserOccurence = None
+giantLaser_loc = -800
+giantLaser_yspeed = 5
+giantLaserstopmove = False
 done_moving = 0
+warningsign = False
+angle = 0
+
 
 def gameover():
     background(255)
@@ -86,12 +89,14 @@ def bossDead():
     global boss_attackspeed
     global boss_attack
     global attacked
+    global boss_hp
     
     score += 500
     total_score += score
     boss_attackspeed = PVector(0, 0)
     boss_attack = PVector(width + 100, height + 100)
     attacked = True
+    boss_hp = -1
 
 
 def giantLaser():
@@ -99,14 +104,14 @@ def giantLaser():
     return num >= 0.8
 
 
-def retry_level():
+def reset_level():
 
     # Retry function to reset the level 
     global pos
     global frames
     global laser_list
     global enemy_list
-    global lives, lives_lost
+    global lives
     global x_level1_background, y_level1_background, background1
     global x_level2_background, y_level2_background, background2
     global x_level3_background, y_level3_background, background3
@@ -117,7 +122,7 @@ def retry_level():
     global countdown
     global powerup_heart_loc, powerup_speed, powerup_heart_loc_spawn, powerup_heart_trigger 
     global powerup_scoremultiply_loc, powerup_scoremultiply_trigger, powerup_scoremultiply_time, powerup_scoremultiply_spawn 
-    global randomSpawn, warningcolour, tempx, temp, img_loc, temps, giantLaserSpawn, done_moving
+    global giantLasertrigger, warningcolour, passedLasertrigger, randomLaserOccurence, giantLaser_loc, giantLaser_yspeed, giantLaserstopmove, done_moving, warningsign
     
     pos = PVector(0 + player_size / 2, 300)
     laser_list = []
@@ -139,13 +144,14 @@ def retry_level():
     boss_attackspeed = PVector(0,0)
     boss_speed = PVector(2,0)
     attacked = False
-    randomSpawn = random(frames + 300, 1000)
+    giantLasertrigger = random(frames + 300, 1000)
     warningcolour = 255
-    tempx = 0
-    temp = None
-    img_loc = -800
-    temps = 5
-    giantLaserSpawn = False
+    passedLasertrigger = 0
+    randomLaserOccurence = giantLaser()
+    giantLaser_loc = -800
+    giantLaser_yspeed = 5
+    giantLaserstopmove = False
+    warningsign = False
     done_moving = 0
     
     if screen == 'gameover1':
@@ -166,8 +172,6 @@ def retry_level():
         y_level3_background = 0
         screen = 'level_3_loadingscreen'
     
-
-
 
 def powerup_scoremultiply_reset():
 
@@ -211,7 +215,7 @@ def setup():
     global powerup_scorepic
     global powerup_heartpic
     global giantLaserpic
-    global temp
+    global randomLaserOccurence
     size(800, 600)
     background1 = loadImage("background1.jpg")
     background2 = loadImage("background2.jpg")
@@ -220,7 +224,7 @@ def setup():
     powerup_scorepic = loadImage("powerup_score.gif")
     powerup_heartpic = loadImage("powerup_heart.gif")
     giantLaserpic = loadImage("giant_laser.gif")
-    temp = giantLaser()
+    randomLaserOccurence = giantLaser()
 
 
 def draw():
@@ -245,7 +249,9 @@ def draw():
     global powerup_size, powerup_speed
     global powerup_heart_loc, powerup_heart_spawn, powerup_heart_trigger, powerup_heartpic
     global powerup_scoremultiply_loc, powerup_scoremultiply, powerup_scoremultiply_trigger, powerup_scoremultiply_time, powerup_scoremultiply_spawn, countdown, powerup_scorepic
-    global randomSpawn, warningcolour, tempx, temp, giantLaserpic, img_loc, temps, giantLaserSpawn, done_moving
+    global giantLasertrigger, warningcolour, passedLasertrigger, randomLaserOccurence, giantLaserpic, giantLaser_loc, giantLaser_yspeed, giantLaserstopmove, done_moving, warningsign
+    global angle
+
 
     #If the screen is on the menu screen (default), then do the following things
     if screen == "menu":
@@ -345,28 +351,47 @@ def draw():
         #Creates the title
         textSize(48)
         textAlign(CENTER, TOP)
-        text("How To Play", width / 2, height / 2 - 250)
+        text("How To Play", width / 2, height / 2 - 300)
         
         #How to play rules
-        textSize(24)
+        textSize(18)
         textAlign(LEFT)
 
-        text("Control your character with the arrow keys; UP and DOWN.", 65, 140)
-        text("Use the Spacebar to shoot your weapon.", 65, 175)
-        text("You have 3 lives, when you reach 0 lives, you lose.", 65, 210)
-        text("Each level resets your lives to 3.", 65, 245)
-        text("Each level has many enemies. There are 3 levels in total.", 65, 280)
-        text("Each enemy defeated adds to your score.", 65, 315)
-        text("Each level has a boss at the end. Defeating it clears the level.", 65, 350)
+        text("You are the red ellipse.", 65, 90)
+        text("Control your character using the UP and DOWN arrow keys.", 65, 120)
+        text("Shoot with the spacebar.", 65, 150)
+        text("Your goal is to defeat as many enemies as you can.", 65, 180)
+        text("and defeat the boss at the end of that level.", 65, 210)
+        text("You have 5 lives, when you reach 0 lives, you can retry", 65, 240) 
+        text("You lose a life when you get hit by an enemy or boss.", 65, 270)
+        text("Each life lost is counted, even after a retry.", 65, 300)
+        text("You will recieve a bonus to your score depending on how many lives were lost.", 65, 330)
+        text("Each level resets your lives to 5.", 65, 360)
+        text("There are 3 levels in total.", 65, 390)
+        text("Each enemy defeated adds to your score.", 65, 420)
+        text("Defeating the boss clears the level and grants an extra score bonus.", 65, 450)
+        text("There are also powerups with different effects.", 65, 480)
+
+        pushMatrix()
+        imageMode(CENTER)
+        translate(730,80)
+        powerup_scorepic.resize(powerup_size,powerup_size)
+        rotate(radians(angle))
+        image(powerup_scorepic,0,0)
+        popMatrix()
+        
+        
+        angle += 5
         
         #Creates the "back" button to return to the main menu
+        textSize(28)
         fill(hover_colour4[0], hover_colour4[1], hover_colour4[2])
-        rect(width - 760, height - 80, 70, 50)
+        rect(width - 760, height - 70, 70, 50)
         fill(0)
-        text("Back", width - 750, height - 50)
+        text("Back", width - 755, height - 37)
 
         #Finds the center of the back button
-        center_back_square = PVector(width - 760 + 35, height - 80 + 25)
+        center_back_square = PVector(width - 760 + 35, height - 45)
         
         #Finds the difference between the center of the back button and the player's mouse
         diff_back_sq = PVector(mouseX - center_back_square.x, mouseY - center_back_square.y)
@@ -452,10 +477,9 @@ def draw():
         #Loops through the laser_list and draws them (according to their location)
         #They also have their own speed variable so they move from left to right
         if key_space == True:
-            if time >= last_shot + 500:
+            if time >= last_shot + 350:
                 laser_list.append(PVector(pos.x + player_size / 2, pos.y))
                 last_shot = time
-                key_space = False
 
        
         for lasers in laser_list:
@@ -532,12 +556,12 @@ def draw():
                         score += enemy_kill_score
                     break
 
-        if temp:
-            if frames == floor(randomSpawn):
-                tempx = time
-
-                
-        if tempx > 0:
+        if randomLaserOccurence:
+            if frames == floor(giantLasertrigger):
+                passedLasertrigger = time
+                warningsign = True    
+                                      
+        if warningsign:
             textAlign(CENTER,CENTER)
             textSize(108)
             fill(warningcolour)
@@ -547,38 +571,352 @@ def draw():
                     warningcolour = 0
                 else:
                     warningcolour = 255
-                              
-        
-        if time >= tempx + 4000 and frames > floor(randomSpawn):
-            tempx = 0
-            temp = False
+                    
+        if time >= passedLasertrigger + 4000 and frames > floor(giantLasertrigger) and randomLaserOccurence:
+            passedLasertrigger = 0
+            warningsign = False
 
             pushMatrix()
             imageMode(CENTER)
             translate(width/2,0)
             rotate(radians(90))
-            image(giantLaserpic,img_loc,0)
+            image(giantLaserpic,giantLaser_loc,0)
             
             
-            if img_loc >= 0 + giantLaserpic.width/2 - 200:
-                temps = 0
+            if giantLaser_loc >= 0 + giantLaserpic.width/2 - 200:
+                giantLaser_yspeed = 0
                 if done_moving == 0:
                     done_moving = time
-                giantLaserSpawn = True
+                giantLaserstopmove = True
                 if time >= done_moving + 3000:
-                    giantLaserSpawn = False
-                    img_loc = 0 - giantLaserpic.width/2 - 200
+                    giantLaserstopmove = False
+                    giantLaser_loc = 0 - giantLaserpic.width/2 - 200
+                    randomLaserOccurence = False
 
 
-            img_loc += temps   
+            giantLaser_loc += giantLaser_yspeed   
             popMatrix()
 
-            if giantLaserSpawn:
+            if giantLaserstopmove:
                 for enemy in enemy_list:
                     if enemy.x <= width/2 + 75 and enemy.x >= width/2 - 75:
                         enemy_list.remove(enemy)
                         break
+    
+                              
+        
+        
+        fill(255, 0, 0)
+        if frames >= powerup_heart_trigger:
+            image(powerup_heartpic,powerup_heart_loc.x,powerup_heart_loc.y)
+            powerup_heart_spawn = True
 
+        if powerup_heart_spawn is True:
+            powerup_heart_loc.sub(powerup_speed)
+
+        if powerup_heart_loc.x < 0:
+            powerup_heart_reset()
+
+        powerup_heart_dif = PVector.sub(pos, powerup_heart_loc)
+        if powerup_heart_dif.mag() < player_size/2 + powerup_size/2:
+            if lives == 5:
+                score += 200
+            else:
+                lives += 1
+            powerup_heart_reset()
+
+        fill(0, 0, 255)
+        if frames >= powerup_scoremultiply_trigger:
+            image(powerup_scorepic,powerup_scoremultiply_loc.x,powerup_scoremultiply_loc.y)
+            powerup_scoremultiply_spawn = True
+
+        if powerup_scoremultiply_spawn is True:
+            powerup_scoremultiply_loc.sub(powerup_speed)
+
+        if powerup_scoremultiply_loc.x < 0:
+            powerup_scoremultiply_reset()
+
+        powerup_score_dif = PVector.sub(pos, powerup_scoremultiply_loc)
+        if powerup_score_dif.mag() < player_size/2 + powerup_size/2:
+            countdown = True
+            powerup_scoremultiply_reset()
+
+        if countdown is True:
+            fill(255)
+            textSize(30)
+            textAlign(BOTTOM, CENTER)
+            text("x2 Score Time :" + str(powerup_scoremultiply_time),
+                 width/2 - 120, height - 45)
+            if frames % 60 == 0:
+                powerup_scoremultiply_time -= 1
+                if powerup_scoremultiply_time == 0:
+                    powerup_scoremultiply_time = 20
+                    countdown = False
+
+        # If the frame count is greater than the scrolling picture's background
+        # Subtracted by the game window width (boss area),
+        # Do the following things
+        if frames > background1.width - width:
+
+            # Stops Spawning Enemies
+            enemy_spawn = True
+
+            # Creates the Boss
+            fill(255)
+            ellipse(boss_loc.x, boss_loc.y, boss_size, boss_size)
+
+            if boss_hp > 0:
+                
+                fill(255)
+                textSize(24)
+                text("Boss HP: " + str(boss_hp), boss_loc.x - boss_size/2 - 13,
+                    boss_loc.y + boss_size/2 + 25)
+    
+            # Boss Speed
+            boss_loc.x -= boss_speed.x
+            if boss_loc.x <= width - 100:
+                boss_speed.x = 0
+
+            if attacked is False:
+                boss_dif = PVector.sub(boss_attack, pos)
+                push = PVector.fromAngle(boss_dif.heading())
+                push.mult(random(4, 6))
+                boss_attackspeed = PVector(0, 0)
+                boss_attackspeed.add(push)
+                attacked = True
+
+            ellipse(boss_attack.x, boss_attack.y, 20, 20)
+            boss_attack.sub(boss_attackspeed)
+            boss_hitplayer = PVector.sub(boss_attack, pos)
+
+            if boss_hitplayer.mag() < player_size/2:
+                #lives -= 1
+                lives_lost += 1
+                boss_attack.x = boss_loc.x
+                boss_attack.y = height/2
+                attacked = False
+
+            if boss_attack.x < 0:
+                boss_attack.x = boss_loc.x
+                boss_attack.y = height/2
+                attacked = False
+
+            for lasers in laser_list:
+                centre_bosslaser = PVector(lasers.x + 13, lasers.y + 5)
+                boss_dif = PVector.sub(centre_bosslaser, boss_loc)
+                if boss_dif.mag() < boss_size/2:
+                    laser_list.remove(lasers)
+                    boss_hp -= laser_damage
+                    break
+
+            if boss_hp == 0:
+                bossDead()
+
+            if boss_hp == -1:
+                boss_loc.y += 2
+                laser_damage = 0
+                if boss_loc.y >= height + boss_size/2:
+                    screen = "level_2_loadingscreen"
+
+        frames += 1        
+                                                     
+        if lives == 0:
+            screen = "gameover1"
+        
+        if screen == 'gameover1':
+            gameover()
+
+        if pos.y - player_size / 2 <= 0:
+            pos.y = 0 + player_size / 2
+
+        if pos.y + player_size / 2 >= height:
+            pos.y = height - player_size / 2
+
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    if screen == "level_2_loadingscreen":
+
+        background(fade_colour, opacity)
+        fill(255, 0, 0, opacity)
+        textSize(58)
+        textAlign(CENTER)
+        text("LEVEL 2", width / 2, height / 2)
+        
+        opacity -= 255 / 40
+        fade_colour += 255 / 40
+        if fade_colour > 255:
+            fade_colour = 0
+            opacity = 255
+            reset_level()
+            screen = "level2"
+
+    if screen == "level2":
+        
+        time = millis()
+        x_level2_background = constrain(x_level2_background, 0,
+                                        background2.width - width)
+        y_level2_background = constrain(y_level2_background, 0,
+                                        background2.height - height)
+        set(-x_level2_background, 0, background2)
+        x_level2_background = frames
+        powerup_scorepic.resize(powerup_size,powerup_size)
+        powerup_heartpic.resize(powerup_size,powerup_size)
+        giantLaserpic.resize(850,150)
+        
+        fill(255)
+        textSize(30)
+        textAlign(BOTTOM, RIGHT)
+        text("Lives: " + str(lives), width - 130, height - 30)
+        text("Score: " + str(score), width - 770, height - 30)
+
+        fill(255, 0, 0)
+        ellipse(pos.x, pos.y, player_size, player_size)
+
+       #Checks if the up or down arrow keys are pressed and moves the player in the corresponding directon
+        if key_up == True:
+            pos.y -= y_speed
+
+        if key_down == True:
+            pos.y += y_speed
+            
+        #Creates the lasers
+        #Loops through the laser_list and draws them (according to their location)
+        #They also have their own speed variable so they move from left to right
+        if key_space == True:
+            if time >= last_shot + 350:
+                laser_list.append(PVector(pos.x + player_size / 2, pos.y))
+                last_shot = time
+
+
+        for lasers in laser_list:
+            fill(0, 255, 0)
+            rect(lasers.x, lasers.y, 26, 10)
+            lasers.x += laser_speed
+            
+            #If the lasers reach the end of the screen, removes the laser location from the list
+            if lasers.x > width + 13:
+                laser_list.remove(lasers)
+                
+            
+        #If the enemy_spawn variable is set to false, create enemies and add their randomized spawn location to the list of enemies        
+        if enemy_spawn is False:
+            enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), 
+                                      random(0 + enemy_size/2, height - enemy_size/2)))
+            
+        # Checks the length of the enemy_list
+        # If it's greater than 10 stop the spawning of enemies,
+        # by setting the enemy_spawn variable to true
+        # Every 40 frames, spawn more enemies
+        # by setting the enemy_spawn variable to false
+
+        if len(enemy_list) > 10:
+            enemy_spawn = True
+
+        if frames % 40 == 0:
+            enemy_spawn = False
+
+        # Creates the enemies
+        # Loops through the list of enemies
+        # and spawns them based on their location stored in the list
+        # They have their own independent speed
+        # Go from right to left (spawns on the right side of the screen)
+        for enemy in enemy_list:
+            fill(255)
+            ellipse(enemy.x, enemy.y, enemy_size, enemy_size)
+            enemy.x -= enemy_speed.x
+
+            # If the enemies go past the left side of the screen,
+            # remove them from the enemy list
+            if enemy.x < 0 - enemy_size:
+                enemy_list.remove(enemy)
+
+            # Collision Detection
+            # If an enemy hits the player,
+            # the number of lives will decrease by 1
+            # and the enemy will be removed
+            dif_playerhit = PVector.sub(enemy, pos)
+            if dif_playerhit.mag() < player_size/2 + enemy_size/2:
+                enemy_list.remove(enemy)
+                lives -= 1
+                lives_lost += 1
+
+            # Loops through the laser_list
+            # Finds the centre of the lasers
+            # and the difference between the centre of the laser
+            # and the centre of the enemies
+            for lasers in laser_list:
+                centre_enemylaser = PVector(lasers.x + 13, lasers.y + 5)
+                dif = PVector.sub(centre_enemylaser, enemy)
+
+                # Checks if the laser hits an enemy
+                # If the distance between the laser
+                # and the enemy is less than the radius of the enemy,
+                # Remove the laser, remove the enemy,
+                # and increase the score by 50 points.
+                if dif.mag() < enemy_size/2:
+                    enemy_list.remove(enemy)
+                    laser_list.remove(lasers)
+                    if countdown is True:
+                        score += enemy_kill_score * powerup_scoremultiply
+                    else:
+                        score += enemy_kill_score
+                    break
+          
+                
+                      
+        print(frames)
+        print(giantLasertrigger)
+        print(giantLaser_loc)                    
+                                        
+        if randomLaserOccurence:
+            if frames == floor(giantLasertrigger):
+                passedLasertrigger = time
+                warningsign = True    
+                                      
+        if warningsign:
+            textAlign(CENTER,CENTER)
+            textSize(108)
+            fill(warningcolour)
+            text("WARNING!",width/2 + 20, height/2)
+            if frames % 60 == 0:
+                if warningcolour == 255:
+                    warningcolour = 0
+                else:
+                    warningcolour = 255
+                    
+        if time >= passedLasertrigger + 4000 and frames > floor(giantLasertrigger) and randomLaserOccurence:
+            passedLasertrigger = 0
+            warningsign = False
+
+            pushMatrix()
+            imageMode(CENTER)
+            translate(width/2,0)
+            rotate(radians(90))
+            image(giantLaserpic,giantLaser_loc,0)
+            
+            
+            if giantLaser_loc >= 0 + giantLaserpic.width/2 - 200:
+                giantLaser_yspeed = 0
+                if done_moving == 0:
+                    done_moving = time
+                giantLaserstopmove = True
+                if time >= done_moving + 3000:
+                    giantLaserstopmove = False
+                    giantLaser_loc = 0 - giantLaserpic.width/2 - 200
+                    randomLaserOccurence = False
+
+
+            giantLaser_loc += giantLaser_yspeed   
+            popMatrix()
+
+            if giantLaserstopmove:
+                for enemy in enemy_list:
+                    if enemy.x <= width/2 + 75 and enemy.x >= width/2 - 75:
+                        enemy_list.remove(enemy)
+                        break
+        
+        
         fill(255, 0, 0)
         if frames >= powerup_heart_trigger:
             image(powerup_heartpic,powerup_heart_loc.x,powerup_heart_loc.y)
@@ -654,7 +992,7 @@ def draw():
             if attacked is False:
                 boss_dif = PVector.sub(boss_attack, pos)
                 push = PVector.fromAngle(boss_dif.heading())
-                push.mult(random(4, 6))
+                push.mult(random(8, 10))
                 boss_attackspeed = PVector(0, 0)
                 boss_attackspeed.add(push)
                 attacked = True
@@ -686,163 +1024,13 @@ def draw():
             
             if boss_hp == 0:
                 bossDead()
-                boss_hp = -1
+
                 
             if boss_hp == -1:
                 boss_loc.y += 2
                 laser_damage = 0
                 if boss_loc.y >= height + boss_size/2:
-                    screen = "level_2_loadingscreen"
-        
-
-        frames += 1        
-                                                     
-        if lives == 0:
-            screen = "gameover1"
-        
-        if screen == 'gameover1':
-            gameover()
-
-        if pos.y - player_size / 2 <= 0:
-            pos.y = 0 + player_size / 2
-
-        if pos.y + player_size / 2 >= height:
-            pos.y = height - player_size / 2
-
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    if screen == "level_2_loadingscreen":
-
-        background(fade_colour, opacity)
-        print(screen)
-        fill(255, 0, 0, opacity)
-        textSize(58)
-        textAlign(CENTER)
-        text("LEVEL 2", width / 2, height / 2)
-        
-        opacity -= 255 / 40
-        fade_colour += 255 / 40
-        if fade_colour > 255:
-            fade_colour = 0
-            opacity = 255
-            lives = 5
-            frames = 0
-            score = 0
-            screen = "level2"
-
-    if screen == "level2":
-        
-        print(frames)
-        time = millis()
-        x_level2_background = constrain(x_level2_background, 0,
-                                        background2.width - width)
-        y_level2_background = constrain(y_level2_background, 0,
-                                        background2.height - height)
-        set(-x_level2_background, 0, background2)
-        x_level2_background = frames
-        
-    
-        
-        fill(255)
-        textSize(30)
-        textAlign(BOTTOM, RIGHT)
-        text("Lives: " + str(lives), width - 130, height - 30)
-        text("Score: " + str(score), width - 770, height - 30)
-
-        fill(255, 0, 0)
-        ellipse(pos.x, pos.y, player_size, player_size)
-
-       #Checks if the up or down arrow keys are pressed and moves the player in the corresponding directon
-        if key_up == True:
-            pos.y -= y_speed
-
-        if key_down == True:
-            pos.y += y_speed
-            
-        #Creates the lasers
-        #Loops through the laser_list and draws them (according to their location)
-        #They also have their own speed variable so they move from left to right
-        if key_space == True:
-            if time >= last_shot + 500:
-                laser_list.append(PVector(pos.x + player_size / 2, pos.y))
-                last_shot = time
-                key_space = False
-
-       
-        for lasers in laser_list:
-            fill(0, 255, 0)
-            rect(lasers.x, lasers.y, 26, 10)
-            lasers.x += laser_speed
-            
-            #If the lasers reach the end of the screen, removes the laser location from the list
-            if lasers.x > width + 13:
-                laser_list.remove(lasers)
-                
-            
-        #If the enemy_spawn variable is set to false, create enemies and add their randomized spawn location to the list of enemies        
-        if enemy_spawn is False:
-            enemy_list.append(PVector(random(width + enemy_size/2, width + enemy_size*5), 
-                                      random(0 + enemy_size/2, height - enemy_size/2)))
-            
-        # Checks the length of the enemy_list
-        # If it's greater than 10 stop the spawning of enemies,
-        # by setting the enemy_spawn variable to true
-        # Every 40 frames, spawn more enemies
-        # by setting the enemy_spawn variable to false
-
-        if len(enemy_list) > 10:
-            enemy_spawn = True
-
-        if frames % 40 == 0:
-            enemy_spawn = False
-
-        # Creates the enemies
-        # Loops through the list of enemies
-        # and spawns them based on their location stored in the list
-        # They have their own independent speed
-        # Go from right to left (spawns on the right side of the screen)
-        for enemy in enemy_list:
-            fill(255)
-            ellipse(enemy.x, enemy.y, enemy_size, enemy_size)
-            enemy.x -= enemy_speed.x
-
-            # If the enemies go past the left side of the screen,
-            # remove them from the enemy list
-            if enemy.x < 0 - enemy_size:
-                enemy_list.remove(enemy)
-
-            # Collision Detection
-            # If an enemy hits the player,
-            # the number of lives will decrease by 1
-            # and the enemy will be removed
-            dif_playerhit = PVector.sub(enemy, pos)
-            if dif_playerhit.mag() < player_size/2 + enemy_size/2:
-                enemy_list.remove(enemy)
-                lives -= 1
-                lives_lost += 1
-
-            # Loops through the laser_list
-            # Finds the centre of the lasers
-            # and the difference between the centre of the laser
-            # and the centre of the enemies
-            for lasers in laser_list:
-                centre_enemylaser = PVector(lasers.x + 13, lasers.y + 5)
-                dif = PVector.sub(centre_enemylaser, enemy)
-
-                # Checks if the laser hits an enemy
-                # If the distance between the laser
-                # and the enemy is less than the radius of the enemy,
-                # Remove the laser, remove the enemy,
-                # and increase the score by 50 points.
-                if dif.mag() < enemy_size/2:
-                    enemy_list.remove(enemy)
-                    laser_list.remove(lasers)
-                    if countdown is True:
-                        score += enemy_kill_score * powerup_scoremultiply
-                    else:
-                        score += enemy_kill_score
-                    break
+                    screen = "level_3_loadingscreen"
                 
         if pos.y - player_size / 2 <= 0:
             pos.y = 0 + player_size / 2
@@ -908,7 +1096,7 @@ def keyPressed():
     if key == " ":
         key_space = True
         if "gameover" in screen:
-            retry_level()
+            reset_level()
 
 
 def keyReleased():
