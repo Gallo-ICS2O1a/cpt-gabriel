@@ -1142,7 +1142,7 @@ def draw():
 
             # Boss Speed
             boss_loc.x -= boss_speed.x
-            boss_attack.x -= boss.speed.x
+            boss_attack.x -= boss_speed.x
             if boss_loc.x <= width - 100:
                 boss_speed.x = 0
 
