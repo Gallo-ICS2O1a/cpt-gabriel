@@ -1,4 +1,4 @@
-screen = "level2"
+screen = "ending"
 frames = 0
 colour1 = 255
 colour2 = 255
@@ -275,7 +275,7 @@ def draw():
         strokeWeight(4)
         textAlign(CENTER, CENTER)
         fill(255)
-        text("Airplane Shooting Game", width / 2, height / 2 - 50)
+        text("Space Shooting Game", width / 2, height / 2 - 50)
         
         #Creates the rectangles which the menu options are in
         fill(hover_colour1[0], hover_colour1[1], hover_colour1[2])
@@ -1374,6 +1374,7 @@ def draw():
 
     if screen == 'ending':
         
+        # If the screen is the ending screen do these things
         
         if frames < 300:
             background(0)
@@ -1411,7 +1412,7 @@ def draw():
                 fill(255)
                 text("Total Score: " + str(total_score), width/2, height/2 - 100)
                 text("Lives Lost: " + str(lives_lost), width/2, height/2)
-            elif frames < 900 and frames > 600:
+            elif frames < 800 and frames > 600:
                 if lives_lost <= 3:
                     bonus = 1000
                 elif lives_lost <= 5:
@@ -1420,6 +1421,7 @@ def draw():
                     bonus = 100
                 else:
                     bonus = 0
+                fill(255)
                 background(0)
                 text("Total Score: " + str(total_score) + " + " + str(bonus), width/2, height/2 -100)
             elif frames > 800:
@@ -1436,27 +1438,74 @@ def draw():
                     grade = 'D'
                 else:
                     grade = 'F'
+                fill(255)
+                textSize(40)
                 text("Total Score: " + str(total_score + bonus), width/2, height/2 - 100)
                 text("Grade: " + grade, width/2, height/2 + 100)
-            
+
+
+
+                fill(hover_colour1[0], hover_colour1[1], hover_colour1[2])
+                rect(width - 760, height - 70, 100, 60)
+                fill(hover_colour2[0], hover_colour2[1], hover_colour2[2])
+                rect(width - 140, height - 70, 100, 60)
+                
+                fill(0)
+                textSize(28)
+                text("Quit", width - 710, height - 45)
+                text("Menu", width - 90, height - 45)
+                center_quit_square = PVector(width - 760 + 50, height - 70 + 30)
+                center_replay_square = PVector(width - 140 + 50, height - 70 + 30)
+                diff_quit_sq = PVector(mouseX - center_quit_square.x, mouseY - center_quit_square.y)
+                diff_replay_sq = PVector(mouseX - center_replay_square.x, mouseY - center_replay_square.y)
+                
+                if diff_quit_sq.x >= -50 and diff_quit_sq.x <= 50 and diff_quit_sq.y >= -30 and diff_quit_sq.y <= 30:
+                    hover_colour1[0] = 0
+                    hover_colour1[1] = 206
+                    hover_colour1[2] = 209
+                    if click is True:
+                        exit()
+
+                if diff_quit_sq.x <= -50 or diff_quit_sq.x >= 50 or diff_quit_sq.y <= -30 or diff_quit_sq.y >= 30:
+                    hover_colour1[0] = 175
+                    hover_colour1[1] = 238
+                    hover_colour1[2] = 238
+                    
+                if diff_replay_sq.x >= -50 and diff_replay_sq.x <= 50 and diff_replay_sq.y >= -30 and diff_replay_sq.y <= 30:
+                    hover_colour2[0] = 0
+                    hover_colour2[1] = 206
+                    hover_colour2[2] = 209
+                    if click is True:
+                        screen = 'menu'
+                    
+                    
+                if diff_replay_sq.x <= -50 or diff_replay_sq.x >= 50 or diff_replay_sq.y <= -30 or diff_replay_sq.y >= 30:
+                    hover_colour2[0] = 175
+                    hover_colour2[1] = 238
+                    hover_colour2[2] = 238
+                    
             
         print(frames)
         frames += 1
         angle += 3
 
 def mousePressed():
+    # Actions to do when a mouse button is pressed
     global click
     if mouseButton == LEFT:
         click = True
 
 
 def mouseReleased():
+    # Actions to do when the mouse button is released
     global click
     if mouseButton == LEFT:
         click = False
 
 
 def keyPressed():
+    # Actions to do when a specific key is pressed
+    # Used for the movement and shooting of the player
     global key_up
     global key_down
     global key_space
@@ -1477,6 +1526,8 @@ def keyPressed():
 
 
 def keyReleased():
+    # Actions to do when the specific keys are released
+    # Prevents weird movement of player
     global key_up
     global key_down
     global key_space
