@@ -620,11 +620,15 @@ def draw():
                         score += enemy_kill_score
                     break
 
+        # Random laser occurence to help player
+        # If true do the following things
         if randomLaserOccurence:
             if frames == floor(giantLasertrigger):
                 passedLasertrigger = time
                 warningsign = True
 
+        # Flashing warning on screen when
+        # random laser occurence happens
         if warningsign:
             textAlign(CENTER, CENTER)
             textSize(108)
@@ -636,6 +640,8 @@ def draw():
                 else:
                     warningcolour = 255
 
+        # If it's been 4 seconds since the giant laser
+        # was triggered, create the laser
         if (time >= passedLasertrigger + 4000 and
            frames > floor(giantLasertrigger) and
            randomLaserOccurence):
@@ -648,6 +654,8 @@ def draw():
             rotate(radians(90))
             image(giantLaserpic, giantLaser_loc, 0)
 
+            # Makes the giant laser stay on screen for 3 seconds
+            # after reaching the bottom of the screen
             if giantLaser_loc >= 0 + giantLaserpic.width/2 - 200:
                 giantLaser_yspeed = 0
                 if done_moving == 0:
@@ -658,9 +666,13 @@ def draw():
                     giantLaser_loc = 0 - giantLaserpic.width/2 - 200
                     randomLaserOccurence = False
 
+            # giantLaser movement
             giantLaser_loc += giantLaser_yspeed
             popMatrix()
 
+            # Collision detection between the giant laser
+            # and the enemies, if they
+            # hit the laser, they are removed
             if giantLaserstopmove:
                 for enemy in enemy_list:
                     if enemy.x <= width/2 + 75 and enemy.x >= width/2 - 75:
@@ -981,6 +993,7 @@ def draw():
                     break
 
         # Random laser occurence to help player
+        # If true do the following things
         if randomLaserOccurence:
             if frames == floor(giantLasertrigger):
                 passedLasertrigger = time
@@ -1356,6 +1369,7 @@ def draw():
                     break
 
         # Random laser occurence to help player
+        # If true do the following things
         if randomLaserOccurence:
             if frames == floor(giantLasertrigger):
                 passedLasertrigger = time
