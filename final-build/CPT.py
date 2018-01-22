@@ -161,7 +161,7 @@ def reset_level():
     countdown = False
     boss_hp = 100
     boss_loc = PVector(800 + 100, 600/2)
-    boss_attack = PVector(boss_loc.x - boss_size/2, boss_loc.y)
+    boss_attack = PVector(boss_loc.x, boss_loc.y)
     boss_attackspeed = PVector(0, 0)
     boss_speed = PVector(2, 0)
     attacked = False
