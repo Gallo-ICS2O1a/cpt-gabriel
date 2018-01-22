@@ -404,7 +404,7 @@ def draw():
         textSize(18)
         textAlign(LEFT)
 
-        text("You are the red ellipse.", 65, 90)
+        text("You are the yellow ellipse.", 65, 90)
         text("Control your character using the "
              "UP and DOWN arrow keys.", 65, 120)
         text("Shoot with the spacebar.", 65, 150)
@@ -522,7 +522,7 @@ def draw():
         text("Score: " + str(score), width - 770, height - 30)
 
         # Creates the player
-        fill(255, 0, 0)
+        fill(255, 255, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
 
         # Checks if the up or down arrow keys are pressed
@@ -882,7 +882,7 @@ def draw():
         text("Score: " + str(score), width - 770, height - 30)
 
         # Creates the player
-        fill(255, 0, 0)
+        fill(255, 255, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
 
         # Checks if the up or down arrow keys are pressed
@@ -1257,7 +1257,7 @@ def draw():
         text("Score: " + str(score), width - 770, height - 30)
 
         # Creates the player
-        fill(255, 0, 0)
+        fill(255, 255, 0)
         ellipse(pos.x, pos.y, player_size, player_size)
 
         # Checks if the up or down arrow keys are pressed and
